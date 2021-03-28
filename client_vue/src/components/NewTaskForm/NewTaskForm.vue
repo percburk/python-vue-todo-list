@@ -11,7 +11,7 @@
     </select>
     <label for="due-date">Set Due Date:</label>
     <input id="due-date" placeholder="Due Date" type="date" />
-    <button>Add</button>
+    <el-button type="primary">Add</el-button>
   </form>
   <div>
     <h3>{{ taskInput }}</h3>
