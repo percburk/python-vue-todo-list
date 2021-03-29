@@ -1,34 +1,40 @@
 <template>
   <h5>Add a new Task:</h5>
-  <form @submit.prevent="addNewTodo">
-    <label for="new-task">Add new Task:</label>
-    <input id="new-task" placeholder="New Task" v-model="taskInput" />
+  <form>
+    <label for="new-task-text">Add new Task:</label>
+    <input id="new-task-text" placeholder="New Task" v-model="newTask.task" />
     <label for="priority">Set Priority:</label>
-    <select name="priority" id="priority">
+    <select name="priority" id="priority" v-model="newTask.priority">
       <option value="!">!</option>
       <option value="!!">!!</option>
       <option value="!!!">!!!</option>
     </select>
     <label for="due-date">Set Due Date:</label>
-    <input id="due-date" placeholder="Due Date" type="date" />
-    <el-button type="primary">Add</el-button>
+    <input
+      id="due-date"
+      placeholder="Due Date"
+      type="date"
+      v-model="newTask.due_date"
+    />
+    <el-button type="primary" @click="addNewTask(newTask)">Add</el-button>
   </form>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { reactive } from 'vue';
 
 export default {
   setup() {
-    const taskInput = ref('');
-    const addNewTodo = () => {
-      console.log(taskInput.value);
-      taskInput.value = '';
-    };
+    const newTask = reactive({ task: '', due_date: '', priority: '' });
     return {
-      addNewTodo,
-      taskInput,
+      newTask,
     };
+  },
+  methods: {
+    addNewTask: function(newTask) {
+      console.log(newTask);
+      return this.$store.dispatch('ADD_TASK', newTask);
+    },
   },
 };
 </script>

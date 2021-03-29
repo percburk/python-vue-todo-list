@@ -15,7 +15,12 @@
         <td>{{ formatDate(task.due_date) }}</td>
         <td>{{ task.priority }}</td>
         <td>{{ task.done }}</td>
-        <td>Actions</td>
+        <td>
+          <el-button-group>
+            <el-button type="primary" icon="el-icon-edit" />
+            <el-button type="danger" icon="el-icon-delete" />
+          </el-button-group>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -25,7 +30,7 @@
 import { DateTime } from 'luxon';
 export default {
   mounted() {
-    this.$store.dispatch('FETCH_TASKS');
+    return this.$store.dispatch('FETCH_TASKS');
   },
   computed: {
     tasks() {

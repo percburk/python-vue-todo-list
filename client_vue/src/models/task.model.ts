@@ -9,5 +9,5 @@ export interface Task {
 export interface NewTask {
   task: string;
   priority: number;
-  date: Date;
+  due_date: Date;
 }

@@ -14,8 +14,11 @@ export default createStore({
     },
   },
   actions: {
-    ADD_TASK(context, task: NewTask) {
-      context.commit('ADD_TASK', task);
+    ADD_TASK({ dispatch }, task: NewTask) {
+      axios
+        .post('http://localhost:5000/api/todos', task)
+        .then(() => dispatch('FETCH_TASKS'))
+        .catch((err) => console.log('Error in ADD_TASK', err));
     },
     EDIT_TASK(context, task: Task) {
       context.commit('EDIT_TASK', task);
@@ -27,7 +30,7 @@ export default createStore({
       axios
         .get('http://localhost:5000/api/todos')
         .then((response) => commit('SET_TASKS', response.data))
-        .catch((err) => console.log('Error in getting tasks', err));
+        .catch((err) => console.log('Error in FETCH_TASKS', err));
     },
   },
   getters: {
