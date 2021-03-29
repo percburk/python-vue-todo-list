@@ -32,7 +32,6 @@ export default {
   },
   methods: {
     addNewTask: function(newTask) {
-      console.log(newTask);
       return this.$store.dispatch('ADD_TASK', newTask);
     },
   },

@@ -3,14 +3,14 @@ from flask_cors import CORS
 import os
 import pg8000.native
 
-# Instantiate app
+
+# Start app, add CORS to all routes
 app = Flask(__name__)
 app.config.from_object(__name__)
-
-# Add CORS headers to all requests
 CORS(app)
 
 
+# GET and POST routes for todo table
 @app.route('/api/todos', methods=['GET', 'POST'])
 def todos():
     conn = pg8000.dbapi.connect(
@@ -44,3 +44,16 @@ def todos():
     else:
         print('no routes found')
         return 'no routes found'
+
+
+# DELETE route for todo table
+@app.route('/api/todos/<id>', methods=["DELETE"])
+def delete_todo(id):
+    conn = pg8000.dbapi.connect(
+        user=os.getenv('POSTGRES_USER'),
+        database="python_vue_todo"
+    )
+    cur = conn.cursor()
+    cur.execute('DELETE FROM "todos" WHERE "id" = %s', (id))
+    conn.commit()
+    return make_response('DELETED', 204)

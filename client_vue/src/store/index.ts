@@ -23,19 +23,17 @@ export default createStore({
     EDIT_TASK(context, task: Task) {
       context.commit('EDIT_TASK', task);
     },
-    DELETE_TASK(context, id: number) {
-      context.commit('DELETE_TASK', id);
+    DELETE_TASK({ dispatch }, id: number) {
+      axios
+        .delete(`http://localhost:5000/api/todos/${id}`)
+        .then(() => dispatch('FETCH_TASKS'))
+        .catch((err) => console.log('Error in DELETE_TASK', err));
     },
     FETCH_TASKS({ commit }) {
       axios
         .get('http://localhost:5000/api/todos')
         .then((response) => commit('SET_TASKS', response.data))
         .catch((err) => console.log('Error in FETCH_TASKS', err));
-    },
-  },
-  getters: {
-    allTasks(state): Array<Task> {
-      return state.tasks;
     },
   },
 });

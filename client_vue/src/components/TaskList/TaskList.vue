@@ -18,7 +18,11 @@
         <td>
           <el-button-group>
             <el-button type="primary" icon="el-icon-edit" />
-            <el-button type="danger" icon="el-icon-delete" />
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              @click="deleteTask(task.id)"
+            />
           </el-button-group>
         </td>
       </tr>
@@ -40,6 +44,9 @@ export default {
   methods: {
     formatDate(val) {
       return val ? DateTime.fromRFC2822(val).toFormat('LLL d') : '';
+    },
+    deleteTask(id) {
+      return this.$store.dispatch('DELETE_TASK', id);
     },
   },
 };
