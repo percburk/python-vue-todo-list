@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS
 import os
 import pg8000.native
 
 # Instantiate app
 app = Flask(__name__)
 app.config.from_object(__name__)
+CORS(app)
 
 
 @app.route('/api/todos', methods=['GET', 'POST'])
@@ -18,10 +20,10 @@ def todos():
     if request.method == 'GET':
         cur.execute('SELECT * FROM "todos";')
         rows = cur.fetchall()
-        keys = [k[0] for k in cursor.description]
-        results = [dict(zip(keys, row)) for row in rows]
+        keys = [k[0] for k in cur.description]
+        results = jsonify([dict(zip(keys, row)) for row in rows])
         conn.commit()
-        return jsonify(results)
+        return results
 
     elif request.method == 'POST':
         new_task = request.get_json()
