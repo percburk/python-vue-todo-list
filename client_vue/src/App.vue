@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import NewTaskForm from '../NewTaskForm/NewTaskForm';
+import NewTaskForm from './components/NewTaskForm/NewTaskForm';
 export default {
   name: 'App',
   components: {

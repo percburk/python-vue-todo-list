@@ -3,5 +3,11 @@ export interface Task {
   task: string;
   done: boolean;
   priority: number;
-  created?: Date;
+  due_date?: Date;
+}
+
+export interface NewTask {
+  task: string;
+  priority: number;
+  date: Date;
 }

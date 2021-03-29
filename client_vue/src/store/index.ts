@@ -1,32 +1,20 @@
 import { createStore, createLogger } from 'vuex';
-import { Task } from '@/models/task.model';
+import axios from 'axios';
+// Models
+import { Task, NewTask } from '@/models/task.model';
 
 export default createStore({
   plugins: process.env.NODE_ENV === 'development' ? [createLogger()] : [],
   state: {
-    success: true,
-    message: undefined,
-    errorCode: 200,
-    version: '1.0.0',
-    data: new Array<Task>(),
+    tasks: new Array<Task>(),
   },
   mutations: {
-    addTask(state, task: Task) {
-      state.data.push(task);
-    },
-    editTask(state, task: Task) {
-      const i: number = state.data.findIndex((item) => item.id === task.id);
-      state.data[i] = task;
-    },
-    deleteTask(state, id: number) {
-      const i: number = state.data.findIndex((item) => item.id === id);
-      if (i > -1) {
-        state.data.splice(i, 1);
-      }
+    SET_TASKS(state, tasks) {
+      state.tasks = tasks;
     },
   },
   actions: {
-    addTask(context, task: Task) {
+    addTask(context, task: NewTask) {
       context.commit('ADD_TASK', task);
     },
     editTask(context, task: Task) {
@@ -35,10 +23,16 @@ export default createStore({
     deleteTask(context, id: number) {
       context.commit('DELETE_TASK', id);
     },
+    FETCH_TASKS({ commit }) {
+      axios
+        .get('http://localhost:5000/api/todos')
+        .then((response) => commit('SET_TASKS', response.data))
+        .catch((err) => console.log('Error in getting tasks', err));
+    },
   },
   getters: {
-    tasks(state): Array<Task> {
-      return state.data;
+    TASKS(state): Array<Task> {
+      return state.tasks;
     },
   },
 });

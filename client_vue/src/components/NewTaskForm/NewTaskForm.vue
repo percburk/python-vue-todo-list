@@ -33,5 +33,8 @@ export default {
       taskInput,
     };
   },
+  mounted() {
+    this.$store.dispatch('FETCH_TASKS');
+  },
 };
 </script>
