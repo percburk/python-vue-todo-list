@@ -33,10 +33,11 @@ def todos():
             INSERT INTO "todos" ("task", "due_date", "priority")
             VALUES (%s, %s, %s);
         """
-        cur.execute(
-            query,
-            (new_task['task'], new_task['due_date'], new_task['priority'])
-        )
+        cur.execute(query, (
+            new_task['task'],
+            new_task['due_date'],
+            new_task['priority']
+        ))
         conn.commit()
         return make_response('CREATED', 201)
 
