@@ -31,7 +31,7 @@ export default createStore({
     },
   },
   getters: {
-    TASKS(state): Array<Task> {
+    tasks(state): Array<Task> {
       return state.tasks;
     },
   },

@@ -6,6 +6,8 @@ import pg8000.native
 # Instantiate app
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+# Add CORS headers to all requests
 CORS(app)
 
 
