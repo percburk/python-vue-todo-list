@@ -14,13 +14,13 @@ export default createStore({
     },
   },
   actions: {
-    addTask(context, task: NewTask) {
+    ADD_TASK(context, task: NewTask) {
       context.commit('ADD_TASK', task);
     },
-    editTask(context, task: Task) {
+    EDIT_TASK(context, task: Task) {
       context.commit('EDIT_TASK', task);
     },
-    deleteTask(context, id: number) {
+    DELETE_TASK(context, id: number) {
       context.commit('DELETE_TASK', id);
     },
     FETCH_TASKS({ commit }) {
@@ -31,7 +31,7 @@ export default createStore({
     },
   },
   getters: {
-    tasks(state): Array<Task> {
+    allTasks(state): Array<Task> {
       return state.tasks;
     },
   },

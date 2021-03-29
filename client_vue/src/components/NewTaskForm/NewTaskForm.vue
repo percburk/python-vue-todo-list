@@ -13,9 +13,6 @@
     <input id="due-date" placeholder="Due Date" type="date" />
     <el-button type="primary">Add</el-button>
   </form>
-  <div>
-    <h3>{{ taskInput }}</h3>
-  </div>
 </template>
 
 <script>
@@ -32,9 +29,6 @@ export default {
       addNewTodo,
       taskInput,
     };
-  },
-  mounted() {
-    this.$store.dispatch('FETCH_TASKS');
   },
 };
 </script>

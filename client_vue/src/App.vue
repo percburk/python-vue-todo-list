@@ -1,15 +1,18 @@
 <template>
   <div>
     <NewTaskForm />
+    <TaskList />
   </div>
 </template>
 
 <script>
 import NewTaskForm from './components/NewTaskForm/NewTaskForm';
+import TaskList from './components/TaskList/TaskList';
 export default {
   name: 'App',
   components: {
     NewTaskForm,
+    TaskList,
   },
 };
 </script>
