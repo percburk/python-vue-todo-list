@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 import os
-import pg8000.native
+import pg8000
 
 
 # Start app, add CORS to all routes
@@ -20,14 +20,14 @@ def todos():
     cur = conn.cursor()
 
     if request.method == "GET":
-        cur.execute('SELECT * FROM "todos";')
+        cur.execute('SELECT * FROM "todos" ORDER BY "due_date";')
         rows = cur.fetchall()
         keys = [k[0] for k in cur.description]
         results = jsonify([dict(zip(keys, row)) for row in rows])
         conn.commit()
         return results
 
-    elif request.method == "POST":
+    else:
         new_task = request.get_json()
         query = """
             INSERT INTO "todos" ("task", "due_date", "priority")
@@ -39,21 +39,25 @@ def todos():
             new_task["priority"]
         ))
         conn.commit()
-        return make_response("CREATED", 201)
-
-    else:
-        print("no routes found")
-        return "no routes found"
+        return make_response("Created", 201)
 
 
-# DELETE route for todo table
-@app.route("/api/todos/<id>", methods=["DELETE"])
-def delete_todo(id):
+# DELETE route to delete a task, PUT route for toggling done status of task
+@app.route("/api/todos/<id>", methods=["DELETE", "PUT"])
+def delete_complete_todo(id):
     conn = pg8000.dbapi.connect(
         user=os.getenv("POSTGRES_USER"),
         database="python_vue_todo"
     )
     cur = conn.cursor()
-    cur.execute('DELETE FROM "todos" WHERE "id" = %s', (id,))
-    conn.commit()
-    return make_response("DELETED", 204)
+
+    if request.method == "DELETE":
+        cur.execute('DELETE FROM "todos" WHERE "id" = %s', (id,))
+        conn.commit()
+        return make_response("Deleted", 204)
+
+    else:
+        query = 'UPDATE "todos" SET "done" = NOT "done" WHERE "id" = %s'
+        cur.execute(query, (id,))
+        conn.commit()
+        return make_response("Updated", 200)

@@ -14,14 +14,29 @@
         <td>{{ task.task }}</td>
         <td>{{ formatDate(task.due_date) }}</td>
         <td>{{ task.priority }}</td>
-        <td>{{ task.done }}</td>
+        <td>
+          <el-button
+            v-if="task.done"
+            type="success"
+            icon="el-icon-check"
+            round
+            @click="toggleDone(task.id)"
+          />
+          <el-button
+            v-else
+            icon="el-icon-check"
+            round
+            @click="toggleDone(task.id)"
+          />
+        </td>
         <td>
           <el-button-group>
-            <el-button type="primary" icon="el-icon-edit" />
+            <el-button type="primary" icon="el-icon-edit" round />
             <el-button
               type="danger"
               icon="el-icon-delete"
               @click="deleteTask(task.id)"
+              round
             />
           </el-button-group>
         </td>
@@ -47,6 +62,9 @@ export default {
     },
     deleteTask(id) {
       return this.$store.dispatch('DELETE_TASK', id);
+    },
+    toggleDone(id) {
+      return this.$store.dispatch('TOGGLE_DONE_TASK', id);
     },
   },
 };

@@ -1,4 +1,4 @@
-import { createStore, createLogger } from 'vuex';
+import { createStore, createLogger, mapActions } from 'vuex';
 import axios from 'axios';
 // Models
 import { Task, NewTask } from '@/models/task.model';
@@ -20,8 +20,11 @@ export default createStore({
         .then(() => dispatch('FETCH_TASKS'))
         .catch((err) => console.log('Error in ADD_TASK', err));
     },
-    EDIT_TASK(context, task: Task) {
-      context.commit('EDIT_TASK', task);
+    TOGGLE_DONE_TASK({ dispatch }, id: number) {
+      axios
+        .put(`http://localhost:5000/api/todos/${id}`)
+        .then(() => dispatch('FETCH_TASKS'))
+        .catch((err) => console.log('Error in TOGGLE_DONE_TASKS', err));
     },
     DELETE_TASK({ dispatch }, id: number) {
       axios
