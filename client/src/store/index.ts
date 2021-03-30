@@ -2,7 +2,7 @@ import { createStore, createLogger } from 'vuex';
 import axios from 'axios';
 // Models
 import { Task, NewTask } from '@/models/task.model';
-// Configure axios instance
+// Create axios instance with proxy
 const axiosInstance = axios.create({ baseURL: process.env.VUE_APP_HTTP_PROXY });
 
 export default createStore({
