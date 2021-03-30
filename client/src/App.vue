@@ -5,9 +5,9 @@
   </div>
 </template>
 
-<script>
-import NewTaskForm from './components/NewTaskForm/NewTaskForm';
-import TaskList from './components/TaskList/TaskList';
+<script lang="ts">
+import NewTaskForm from '@/components/NewTaskForm/NewTaskForm';
+import TaskList from '@/components/TaskList/TaskList';
 export default {
   name: 'App',
   components: {

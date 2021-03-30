@@ -45,9 +45,11 @@
   </table>
 </template>
 
-<script>
+<script lang="ts">
 import { DateTime } from 'luxon';
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   mounted() {
     return this.$store.dispatch('FETCH_TASKS');
   },
@@ -55,17 +57,20 @@ export default {
     tasks() {
       return this.$store.state.tasks;
     },
+    toggleButton(done: boolean): string {
+      return done ? 'primary' : '';
+    },
   },
   methods: {
-    formatDate(val) {
-      return val ? DateTime.fromRFC2822(val).toFormat('LLL d') : '';
+    formatDate(date: string): string {
+      return date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '';
     },
-    deleteTask(id) {
-      return this.$store.dispatch('DELETE_TASK', id);
+    deleteTask(id: number) {
+      this.$store.dispatch('DELETE_TASK', id);
     },
-    toggleDone(id) {
-      return this.$store.dispatch('TOGGLE_DONE_TASK', id);
+    toggleDone(id: number) {
+      this.$store.dispatch('TOGGLE_DONE_TASK', id);
     },
   },
-};
+});
 </script>
