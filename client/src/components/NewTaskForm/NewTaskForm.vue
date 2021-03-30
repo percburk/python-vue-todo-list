@@ -26,19 +26,18 @@
 
 <script lang="ts">
 import { reactive, defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import { NewTask } from '@/models/task.model';
+import { key } from '@/store/store';
 
 export default defineComponent({
   setup() {
+    const store = useStore(key);
     const enteredTask = reactive({ task: '', due_date: '', priority: '' });
     return {
       enteredTask,
+      addTask: (task: NewTask) => store.dispatch('addTask', task),
     };
-  },
-  methods: {
-    addTask: function(enteredTask: NewTask) {
-      this.$store.dispatch('ADD_TASK', enteredTask);
-    },
   },
 });
 </script>

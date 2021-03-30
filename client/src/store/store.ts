@@ -1,43 +1,53 @@
-import { createStore, createLogger } from 'vuex';
+import { InjectionKey } from 'vue';
+import { createStore, createLogger, Store } from 'vuex';
 import axios from 'axios';
 // Models
 import { Task, NewTask } from '@/models/task.model';
 // Create axios instance with proxy
 const axiosInstance = axios.create({ baseURL: process.env.VUE_APP_HTTP_PROXY });
 
-export default createStore({
+export interface State {
+  tasks: Task[];
+}
+
+export const key: InjectionKey<Store<State>> = Symbol();
+
+export const store = createStore<State>({
   plugins: process.env.NODE_ENV === 'development' ? [createLogger()] : [],
+
   state: {
-    tasks: new Array<Task>(),
+    tasks: [],
   },
+
   mutations: {
-    SET_TASKS(state, tasks) {
-      state.tasks = tasks;
+    setTasks(state, tasksFromServer: Task[]) {
+      state.tasks = tasksFromServer;
     },
   },
+  
   actions: {
-    ADD_TASK({ dispatch }, task: NewTask) {
+    addTask({ dispatch }, task: NewTask) {
       axiosInstance
         .post('/api/todos', task)
-        .then(() => dispatch('FETCH_TASKS'))
+        .then(() => dispatch('fetchTasks'))
         .catch((err) => console.log('Error in ADD_TASK', err));
     },
-    TOGGLE_DONE_TASK({ dispatch }, id: number) {
+    toggleDoneTask({ dispatch }, id: number) {
       axiosInstance
         .put(`/api/todos/${id}`)
-        .then(() => dispatch('FETCH_TASKS'))
+        .then(() => dispatch('fetchTasks'))
         .catch((err) => console.log('Error in TOGGLE_DONE_TASKS', err));
     },
-    DELETE_TASK({ dispatch }, id: number) {
+    deleteTask({ dispatch }, id: number) {
       axiosInstance
         .delete(`/api/todos/${id}`)
-        .then(() => dispatch('FETCH_TASKS'))
+        .then(() => dispatch('fetchTasks'))
         .catch((err) => console.log('Error in DELETE_TASK', err));
     },
-    FETCH_TASKS({ commit }) {
+    fetchTasks({ commit }) {
       axiosInstance
         .get('/api/todos')
-        .then((response) => commit('SET_TASKS', response.data))
+        .then((response) => commit('setTasks', response.data))
         .catch((err) => console.log('Error in FETCH_TASKS', err));
     },
   },

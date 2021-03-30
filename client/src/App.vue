@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import NewTaskForm from '@/components/NewTaskForm/NewTaskForm';
-import TaskList from '@/components/TaskList/TaskList';
+import NewTaskForm from '@/components/NewTaskForm/NewTaskForm.vue';
+import TaskList from '@/components/TaskList/TaskList.vue';
 export default {
   name: 'App',
   components: {

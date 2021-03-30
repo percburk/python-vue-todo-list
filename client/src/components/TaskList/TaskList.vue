@@ -46,31 +46,22 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import { key } from '@/store/store';
 import { DateTime } from 'luxon';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
-  mounted() {
-    return this.$store.dispatch('FETCH_TASKS');
-  },
-  computed: {
-    tasks() {
-      return this.$store.state.tasks;
-    },
-    toggleButton(done: boolean): string {
-      return done ? 'primary' : '';
-    },
-  },
-  methods: {
-    formatDate(date: string): string {
-      return date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '';
-    },
-    deleteTask(id: number) {
-      this.$store.dispatch('DELETE_TASK', id);
-    },
-    toggleDone(id: number) {
-      this.$store.dispatch('TOGGLE_DONE_TASK', id);
-    },
+  setup() {
+    const store = useStore(key);
+    onMounted(() => store.dispatch('fetchTasks'));
+    return {
+      tasks: computed(() => store.state.tasks),
+      deleteTask: (id: number) => store.dispatch('deleteTask', id),
+      toggleDone: (id: number) => store.dispatch('toggleDoneTask', id),
+      formatDate: (date: string) =>
+        date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '',
+    };
   },
 });
 </script>
