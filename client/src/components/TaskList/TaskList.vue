@@ -13,10 +13,19 @@
       <tr v-for="task in tasks" :key="task.id">
         <td>{{ task.task }}</td>
         <td>{{ formatDate(task.due_date) }}</td>
-        <td>{{ task.priority }}</td>
+        <td>
+          <el-button
+            size="small"
+            round
+            @click="toggleTaskPriority(task.id, task.priority)"
+          >
+            {{ task.priority }}
+          </el-button>
+        </td>
         <td>
           <el-button
             v-if="task.done"
+            size="small"
             type="success"
             icon="el-icon-check"
             round
@@ -24,6 +33,7 @@
           />
           <el-button
             v-else
+            size="small"
             icon="el-icon-check"
             round
             @click="toggleDone(task.id)"
@@ -31,8 +41,15 @@
         </td>
         <td>
           <el-button-group>
-            <el-button type="primary" icon="el-icon-edit" round />
             <el-button
+              size="small"
+              type="primary"
+              icon="el-icon-edit"
+              round
+              @click="showDialog(task.id)"
+            />
+            <el-button
+              size="small"
               type="danger"
               icon="el-icon-delete"
               @click="deleteTask(task.id)"
@@ -43,25 +60,36 @@
       </tr>
     </tbody>
   </table>
+  <EditModal :dialogOpen="dialogOpen" />
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import { key } from '@/store/store';
+import { defineComponent, computed, onMounted, reactive } from 'vue';
+import { useStore } from '@/store/store';
 import { DateTime } from 'luxon';
+// Components
+import EditModal from '../EditModal/EditModal.vue';
 
 export default defineComponent({
   setup() {
-    const store = useStore(key);
+    const store = useStore();
+    const dialogOpen = reactive({ open: false });
     onMounted(() => store.dispatch('fetchTasks'));
     return {
+      dialogOpen,
       tasks: computed(() => store.state.tasks),
       deleteTask: (id: number) => store.dispatch('deleteTask', id),
       toggleDone: (id: number) => store.dispatch('toggleDoneTask', id),
+      showDialog: (id: number) => {
+        dialogOpen.open = true;
+        store.dispatch('fetchOneTask', id);
+      },
+      toggleTaskPriority: (id: number, priority: string) =>
+        store.dispatch('toggleTaskPriority', { id, priority }),
       formatDate: (date: string) =>
         date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '',
     };
   },
+  components: { EditModal },
 });
 </script>

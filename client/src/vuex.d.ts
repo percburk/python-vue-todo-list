@@ -1,6 +1,6 @@
 import { ComponentCustomProperties } from 'vue';
 import { Store } from '@/vuex';
-import Task from '@/models/task.model';
+import Task from '@/models/models';
 
 declare module '@vue/runtime-core' {
   // declare your own store states
