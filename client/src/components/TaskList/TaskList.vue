@@ -60,7 +60,7 @@
       </tr>
     </tbody>
   </table>
-  <EditModal :dialogOpen="dialogOpen" />
+  <EditModal v-model:dialogOpen="dialogOpen" />
 </template>
 
 <script lang="ts">

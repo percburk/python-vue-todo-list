@@ -25,7 +25,15 @@
     </el-form>
     <div>
       <el-button @click="open = false">Cancel</el-button>
-      <el-button type="primary" @click="editTask(oneTask)">
+      <el-button
+        type="primary"
+        @click="
+          () => {
+            editTask(oneTask);
+            open = false;
+          }
+        "
+      >
         Confirm
       </el-button>
     </div>
@@ -39,9 +47,11 @@ import { Task } from '@/models/models';
 
 export default defineComponent({
   props: ['dialogOpen'],
+  emits: ['update:dialogOpen'],
   setup(props) {
+    console.log(props);
     const store = useStore();
-    const { open } = toRefs(props.dialogOpen);
+    let { open } = toRefs(props.dialogOpen);
 
     return {
       open,
