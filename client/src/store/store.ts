@@ -44,7 +44,8 @@ export const store = createStore<State>({
         .catch((err) => console.log('Error in fetchTasks', err));
     },
     fetchOneTask({ commit }, id: number) {
-      axiosInstance(`/api/todos/${id}`)
+      axiosInstance
+        .get(`/api/todos/${id}`)
         .then((response) => commit('setOneTask', response.data))
         .catch((err) => console.log('Error in fetchOneTask', err));
     },

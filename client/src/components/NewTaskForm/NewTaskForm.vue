@@ -1,31 +1,36 @@
 <template>
   <div class="form-container">
-    <p>Add a New Task:</p>
-    <div class="task-input">
-      <el-input placeholder="New Task" v-model="enteredTask.task" />
-    </div>
-    <div class="priority-select">
-      <el-select
-        name="priority"
-        placeholder="Priority"
-        v-model="enteredTask.priority"
-      >
-        <el-option value="!" label="!" />
-        <el-option value="!!" label="!!" />
-        <el-option value="!!!" label="!!!" />
-      </el-select>
-    </div>
-    <div class="date-picker">
-      <el-date-picker
-        type="date"
-        placeholder="Due Date"
-        v-model="enteredTask.due_date"
+    <div class="input-container">
+      <el-input
+        class="task-input"
+        placeholder="New Task"
+        v-model="enteredTask.task"
       />
     </div>
-    <div class="submit-button">
-      <el-button type="primary" round @click="addTask(enteredTask)">
-        Add
-      </el-button>
+    <div class="date-priority-button">
+      <div class="priority-select">
+        <el-select
+          name="priority"
+          placeholder="Priority"
+          v-model="enteredTask.priority"
+        >
+          <el-option value="!" label="!" />
+          <el-option value="!!" label="!!" />
+          <el-option value="!!!" label="!!!" />
+        </el-select>
+      </div>
+      <div class="date-picker">
+        <el-date-picker
+          type="date"
+          placeholder="Due Date"
+          v-model="enteredTask.due_date"
+        />
+      </div>
+      <div class="submit-button">
+        <el-button type="primary" round @click="addTask(enteredTask)">
+          Add
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -50,14 +55,20 @@ export default defineComponent({
 
 <style>
 .form-container {
-  display: flex;
-  flex-wrap: wrap;
   margin: 10px;
-  align-items: center;
+  padding-bottom: 40px;
+}
+.input-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
 }
 .task-input {
-  width: 400px;
-  margin: 0px 10px;
+  max-width: 400px;
+}
+.date-priority-button {
+  display: flex;
+  justify-content: center;
 }
 .priority-select {
   width: 100px;
