@@ -4,9 +4,21 @@
       <thead>
         <tr>
           <th></th>
-          <th class="task-cell"><i class="el-icon-notebook-2" /></th>
-          <th><i class="el-icon-date" /></th>
-          <th><i class="el-icon-top" /></th>
+          <th class="task-cell">
+            <el-button type="text" @click="selectSort('task')">
+              <i class="el-icon-notebook-2" />
+            </el-button>
+          </th>
+          <th>
+            <el-button type="text" @click="selectSort('date')">
+              <i class="el-icon-date" />
+            </el-button>
+          </th>
+          <th>
+            <el-button type="text" @click="selectSort('priority')">
+              <i class="el-icon-top" />
+            </el-button>
+          </th>
           <th></th>
         </tr>
       </thead>
@@ -19,14 +31,14 @@
               type="success"
               icon="el-icon-check"
               round
-              @click="toggleDone(task.id)"
+              @click="toggleDone({ sort, id: task.id })"
             />
             <el-button
               v-else
               size="small"
               icon="el-icon-check"
               round
-              @click="toggleDone(task.id)"
+              @click="toggleDone({ sort, id: task.id })"
             />
           </td>
           <td class="task-cell">{{ task.task }}</td>
@@ -35,7 +47,13 @@
             <el-button
               size="small"
               round
-              @click="toggleTaskPriority(task.id, task.priority)"
+              @click="
+                toggleTaskPriority({
+                  sort,
+                  id: task.id,
+                  priority: task.priority,
+                })
+              "
             >
               {{ task.priority }}
             </el-button>
@@ -53,7 +71,7 @@
                 size="small"
                 type="danger"
                 icon="el-icon-delete"
-                @click="deleteTask(task.id)"
+                @click="deleteTask({ sort, id: task.id })"
                 round
               />
             </el-button-group>
@@ -62,19 +80,20 @@
       </tbody>
     </table>
   </div>
-  <EditModal v-model:dialogOpen="dialogOpen" />
+  <EditDialog v-model:dialogOpen="dialogOpen" />
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive } from 'vue';
 import { DateTime } from 'luxon';
 import { useStore } from '@/store/store';
+import { IdSort, IdSortPriority } from '@/models/models';
 // Components
-import EditModal from '../EditModal/EditModal.vue';
+import EditDialog from '../EditDialog/EditDialog.vue';
 
 export default defineComponent({
   name: 'TaskList',
-  components: { EditModal },
+  components: { EditDialog },
   setup() {
     const store = useStore();
     const dialogOpen = reactive({ open: false });
@@ -82,14 +101,19 @@ export default defineComponent({
     return {
       dialogOpen,
       tasks: computed(() => store.state.tasks),
-      deleteTask: (id: number) => store.dispatch('deleteTask', id),
-      toggleDone: (id: number) => store.dispatch('toggleDoneTask', id),
+      sort: computed(() => store.state.sort),
+      selectSort: (newSort: string) => {
+        store.commit('setSort', newSort);
+        store.dispatch('fetchTasks', newSort);
+      },
+      deleteTask: (arg: IdSort) => store.dispatch('deleteTask', arg),
+      toggleDone: (arg: IdSort) => store.dispatch('toggleDoneTask', arg),
       showDialog: (id: number) => {
         dialogOpen.open = true;
         store.dispatch('fetchOneTask', id);
       },
-      toggleTaskPriority: (id: number, priority: string) =>
-        store.dispatch('toggleTaskPriority', { id, priority }),
+      toggleTaskPriority: (arg: IdSortPriority) =>
+        store.dispatch('toggleTaskPriority', arg),
       formatDate: (date: string) =>
         date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '',
     };

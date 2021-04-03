@@ -10,36 +10,53 @@ app.config.from_object(__name__)
 CORS(app)
 
 
-# GET and POST routes for todo table
-@app.route("/api/todos", methods=["GET", "POST"])
-def todos():
+# GET route for todo table with sorting
+@app.route("/api/todos/", defaults={'sort': None}, methods=["GET"])
+@app.route("/api/todos/<sort>", methods=["GET"])
+def todos(sort):
     conn = pg8000.dbapi.connect(
         user=os.getenv("POSTGRES_USER"),
         database="python_vue_todo"
     )
     cur = conn.cursor()
 
-    if request.method == "GET":
-        cur.execute('SELECT * FROM "todos" ORDER BY "due_date";')
-        rows = cur.fetchall()
-        keys = [k[0] for k in cur.description]
-        results = jsonify([dict(zip(keys, row)) for row in rows])
-        conn.commit()
-        return results
-
-    else:
-        new_task = request.get_json()
-        query = """
-            INSERT INTO "todos" ("task", "due_date", "priority")
-            VALUES (%s, %s, %s);
+    if sort == "task":
+        sql_text = 'SELECT * FROM "todos" ORDER BY "done", "task", "due_date";'
+    elif sort == "priority":
+        sql_text = """
+            SELECT * FROM "todos" ORDER BY "done", "priority" DESC, "task";
         """
-        cur.execute(query, (
-            new_task["task"],
-            new_task["due_date"],
-            new_task["priority"]
-        ))
-        conn.commit()
-        return make_response("Created", 201)
+    else:
+        sql_text = 'SELECT * FROM "todos" ORDER BY "done", "due_date", "task";'
+
+    cur.execute(sql_text)
+    rows = cur.fetchall()
+    keys = [k[0] for k in cur.description]
+    results = jsonify([dict(zip(keys, row)) for row in rows])
+    conn.commit()
+    return results
+
+
+@app.route("/api/todos/add", methods=["POST"])
+def add_task():
+    conn = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"),
+        database="python_vue_todo"
+    )
+    cur = conn.cursor()
+
+    new_task = request.get_json()
+    query = """
+        INSERT INTO "todos" ("task", "due_date", "priority")
+        VALUES (%s, %s, %s);
+    """
+    cur.execute(query, (
+        new_task["task"],
+        new_task["due_date"],
+        new_task["priority"]
+    ))
+    conn.commit()
+    return make_response("Created", 201)
 
 
 # DELETE route to delete a task, PUT route for toggling done status of task
@@ -67,6 +84,7 @@ def delete_complete_todo(id):
         rows = cur.fetchall()
         keys = [k[0] for k in cur.description]
         results = jsonify(dict(zip(keys, rows[0])))
+        conn.commit()
         return results
 
 
@@ -82,7 +100,6 @@ def toggle_task_priority():
     )
     cur = conn.cursor()
 
-    new_priority = ""
     if priority == "!":
         new_priority = "!!"
     elif priority == "!!":
@@ -111,9 +128,9 @@ def edit_task():
         WHERE "id" = %s;
     """
     cur.execute(sql_text, (
-        task_to_edit["task"], 
+        task_to_edit["task"],
         task_to_edit["due_date"],
-        task_to_edit["priority"], 
+        task_to_edit["priority"],
         task_to_edit["id"]
     ))
     conn.commit()

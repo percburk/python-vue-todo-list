@@ -6,18 +6,27 @@ export interface Task {
   due_date?: Date;
 }
 
+export interface TaskSort extends Task {
+  sort?: string;
+}
+
 export interface NewTask {
   task: string;
   priority: string;
   due_date: Date;
 }
 
-export interface EditPriority {
+export interface IdSort {
   id: number;
-  priority: string;
+  sort?: string;
+}
+
+export interface IdSortPriority extends IdSort {
+  EditPriority: string;
 }
 
 export interface State {
   tasks: Task[];
   oneTask: Task;
+  sort: string;
 }

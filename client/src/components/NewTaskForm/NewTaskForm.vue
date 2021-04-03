@@ -47,7 +47,12 @@ export default defineComponent({
     const enteredTask = reactive({ task: '', due_date: '', priority: '' });
     return {
       enteredTask,
-      addTask: (task: NewTask) => store.dispatch('addTask', task),
+      addTask: (task: NewTask) => {
+        store.dispatch('addTask', task);
+        enteredTask.task = '';
+        enteredTask.due_date = '';
+        enteredTask.priority = '';
+      },
     };
   },
 });

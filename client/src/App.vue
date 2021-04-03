@@ -1,20 +1,16 @@
 <template>
-  <div>
-    <NewTaskForm />
-    <TaskList />
-  </div>
+  <NewTaskForm />
+  <router-view />
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import NewTaskForm from '@/components/NewTaskForm/NewTaskForm.vue';
-import TaskList from '@/components/TaskList/TaskList.vue';
-export default {
+
+export default defineComponent({
   name: 'App',
-  components: {
-    NewTaskForm,
-    TaskList,
-  },
-};
+  components: { NewTaskForm },
+});
 </script>
 
 <style>

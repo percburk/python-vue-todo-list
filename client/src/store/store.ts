@@ -7,7 +7,14 @@ import {
 } from 'vuex';
 import axios from 'axios';
 // Models
-import { Task, NewTask, EditPriority, State } from '@/models/models';
+import {
+  Task,
+  NewTask,
+  IdSortPriority,
+  State,
+  IdSort,
+  TaskSort,
+} from '@/models/models';
 // Create axios instance with proxy
 const axiosInstance = axios.create({ baseURL: process.env.VUE_APP_HTTP_PROXY });
 
@@ -25,6 +32,7 @@ export const store = createStore<State>({
       priority: '',
       due_date: undefined,
     },
+    sort: '',
   },
 
   mutations: {
@@ -34,12 +42,16 @@ export const store = createStore<State>({
     setOneTask(state, oneTaskFromServer: Task) {
       state.oneTask = oneTaskFromServer;
     },
+    setSort(state, sort: string) {
+      state.sort = sort;
+    },
   },
 
   actions: {
-    fetchTasks({ commit }) {
+    fetchTasks({ commit }, sort: string) {
+      const whichRoute = sort ? `/api/todos/${sort}` : '/api/todos';
       axiosInstance
-        .get('/api/todos')
+        .get(whichRoute)
         .then((response) => commit('setTasks', response.data))
         .catch((err) => console.log('Error in fetchTasks', err));
     },
@@ -51,32 +63,34 @@ export const store = createStore<State>({
     },
     addTask({ dispatch }, task: NewTask) {
       axiosInstance
-        .post('/api/todos', task)
+        .post('/api/todos/add', task)
         .then(() => dispatch('fetchTasks'))
         .catch((err) => console.log('Error in addTask', err));
     },
-    editTask({ dispatch }, task: Task) {
+    editTask({ dispatch }, task: TaskSort) {
       axiosInstance
         .put('/api/todos/edit', task)
-        .then(() => dispatch('fetchTasks'))
+        .then(() => dispatch('fetchTasks', task.sort))
         .catch((err) => console.log('Error in editTask', err));
     },
-    toggleDoneTask({ dispatch }, id: number) {
+    toggleDoneTask({ dispatch }, sentIdSort: IdSort) {
+      const { id, sort } = sentIdSort;
       axiosInstance
         .put(`/api/todos/${id}`)
-        .then(() => dispatch('fetchTasks'))
+        .then(() => dispatch('fetchTasks', sort))
         .catch((err) => console.log('Error in toggleDoneTask', err));
     },
-    toggleTaskPriority({ dispatch }, priorityToEdit: EditPriority) {
+    toggleTaskPriority({ dispatch }, priorityToEdit: IdSortPriority) {
       axiosInstance
         .put('/api/todos/priority', priorityToEdit)
-        .then(() => dispatch('fetchTasks'))
+        .then(() => dispatch('fetchTasks', priorityToEdit.sort))
         .catch((err) => console.log('Error in toggleTaskPriority', err));
     },
-    deleteTask({ dispatch }, id: number) {
+    deleteTask({ dispatch }, sentIdSort: IdSort) {
+      const { id, sort } = sentIdSort;
       axiosInstance
         .delete(`/api/todos/${id}`)
-        .then(() => dispatch('fetchTasks'))
+        .then(() => dispatch('fetchTasks', sort))
         .catch((err) => console.log('Error in deleteTask', err));
     },
   },

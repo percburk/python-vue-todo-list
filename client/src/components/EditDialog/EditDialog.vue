@@ -29,7 +29,7 @@
         type="primary"
         @click="
           () => {
-            editTask(oneTask);
+            editTask({ ...oneTask, sort });
             open = false;
           }
         "
@@ -43,21 +43,21 @@
 <script lang="ts">
 import { defineComponent, toRefs, computed } from 'vue';
 import { useStore } from '@/store/store';
-import { Task } from '@/models/models';
+import { TaskSort } from '@/models/models';
 
 export default defineComponent({
-  name: 'EditModal',
+  name: 'EditDialog',
   props: ['dialogOpen'],
   setup(props) {
-    console.log(props);
     const store = useStore();
     let { open } = toRefs(props.dialogOpen);
 
     return {
       open,
+      sort: computed(() => store.state.sort),
       oneTask: computed(() => store.state.oneTask),
-      editTask: (task: Task) => {
-        store.dispatch('editTask', task);
+      editTask: (editedTask: TaskSort) => {
+        store.dispatch('editTask', editedTask);
       },
     };
   },
