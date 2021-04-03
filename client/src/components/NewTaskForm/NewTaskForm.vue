@@ -36,6 +36,7 @@ import { useStore } from '@/store/store';
 import { NewTask } from '@/models/models';
 
 export default defineComponent({
+  name: 'NewTaskForm',
   setup() {
     const store = useStore();
     const enteredTask = reactive({ task: '', due_date: '', priority: '' });

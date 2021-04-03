@@ -71,6 +71,8 @@ import { DateTime } from 'luxon';
 import EditModal from '../EditModal/EditModal.vue';
 
 export default defineComponent({
+  name: 'TaskList',
+  components: { EditModal },
   setup() {
     const store = useStore();
     const dialogOpen = reactive({ open: false });
@@ -90,6 +92,5 @@ export default defineComponent({
         date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '',
     };
   },
-  components: { EditModal },
 });
 </script>

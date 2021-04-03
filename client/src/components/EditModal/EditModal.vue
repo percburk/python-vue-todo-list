@@ -46,8 +46,8 @@ import { useStore } from '@/store/store';
 import { Task } from '@/models/models';
 
 export default defineComponent({
+  name: 'EditModal',
   props: ['dialogOpen'],
-  emits: ['update:dialogOpen'],
   setup(props) {
     console.log(props);
     const store = useStore();
