@@ -52,58 +52,72 @@ export const store = createStore<State>({
 
   // Async actions that trigger routes to the server
   actions: {
-    // Fetches all tasks from db. If sort is present in state, sends it along to 
+    // Fetches all tasks from db. If sort is present in state, sends it along to
     // server to trigger different SQL "ORDER BY" queries
-    fetchTasks({ commit }, sort: string) {
+    async fetchTasks({ commit }, sort: string) {
       const whichRoute = sort ? `/api/todos/sort/${sort}` : '/api/todos';
-      axiosInstance
-        .get(whichRoute)
-        .then((response) => commit('setTasks', response.data))
-        .catch((err) => console.log('Error in fetchTasks', err));
+      try {
+        const response = await axiosInstance.get(whichRoute);
+        commit('setTasks', response.data);
+      } catch (err) {
+        console.log('Error in fetchTasks', err);
+      }
     },
     // Fetches one task to edit in EditDialog
-    fetchOneTask({ commit }, id: number) {
-      axiosInstance
-        .get(`/api/todos/${id}`)
-        .then((response) => commit('setOneTask', response.data))
-        .catch((err) => console.log('Error in fetchOneTask', err));
+    async fetchOneTask({ commit }, id: number) {
+      try {
+        const response = await axiosInstance.get(`/api/todos/${id}`);
+        commit('setOneTask', response.data);
+      } catch (err) {
+        console.log('Error in fetchOneTask', err);
+      }
     },
     // Adds a new task to db
-    addTask({ dispatch }, task: NewTask) {
-      axiosInstance
-        .post('/api/todos/add', task)
-        .then(() => dispatch('fetchTasks'))
-        .catch((err) => console.log('Error in addTask', err));
+    async addTask({ dispatch }, task: NewTask) {
+      try {
+        await axiosInstance.post('/api/todos/add', task);
+        await dispatch('fetchTasks');
+      } catch (err) {
+        console.log('Error in addTask', err);
+      }
     },
     // Sends edits of a task from EditDialog to db
-    editTask({ dispatch }, task: TaskSort) {
-      axiosInstance
-        .put('/api/todos/edit', task)
-        .then(() => dispatch('fetchTasks', task.sort))
-        .catch((err) => console.log('Error in editTask', err));
+    async editTask({ dispatch }, task: TaskSort) {
+      try {
+        await axiosInstance.put('/api/todos/edit', task);
+        await dispatch('fetchTasks', task.sort);
+      } catch (err) {
+        console.log('Error in editTask', err);
+      }
     },
     // Toggles done status of a task from TaskList
-    toggleDoneTask({ dispatch }, sentIdSort: IdSort) {
+    async toggleDoneTask({ dispatch }, sentIdSort: IdSort) {
       const { id, sort } = sentIdSort;
-      axiosInstance
-        .put(`/api/todos/${id}`)
-        .then(() => dispatch('fetchTasks', sort))
-        .catch((err) => console.log('Error in toggleDoneTask', err));
+      try {
+        await axiosInstance.put(`/api/todos/${id}`);
+        await dispatch('fetchTasks', sort);
+      } catch (err) {
+        console.log('Error in toggleDoneTask', err);
+      }
     },
     // Toggles priority level of task from TaskList
-    toggleTaskPriority({ dispatch }, priorityToEdit: IdSortPriority) {
-      axiosInstance
-        .put('/api/todos/priority', priorityToEdit)
-        .then(() => dispatch('fetchTasks', priorityToEdit.sort))
-        .catch((err) => console.log('Error in toggleTaskPriority', err));
+    async toggleTaskPriority({ dispatch }, priorityToEdit: IdSortPriority) {
+      try {
+        await axiosInstance.put('/api/todos/priority', priorityToEdit);
+        await dispatch('fetchTasks', priorityToEdit.sort);
+      } catch (err) {
+        console.log('Error in toggleTaskPriority', err);
+      }
     },
     // Deletes a task from the db
-    deleteTask({ dispatch }, sentIdSort: IdSort) {
+    async deleteTask({ dispatch }, sentIdSort: IdSort) {
       const { id, sort } = sentIdSort;
-      axiosInstance
-        .delete(`/api/todos/${id}`)
-        .then(() => dispatch('fetchTasks', sort))
-        .catch((err) => console.log('Error in deleteTask', err));
+      try {
+        await axiosInstance.delete(`/api/todos/${id}`);
+        await dispatch('fetchTasks', sort);
+      } catch (err) {
+        console.log('Error in deleteTask', err);
+      }
     },
   },
 });
