@@ -6,7 +6,7 @@ import {
   useStore as useBaseStore,
 } from 'vuex';
 import axios from 'axios';
-// Models for type checking
+// Interfaces for type checking
 import {
   Task,
   NewTask,
@@ -17,7 +17,7 @@ import {
 } from '@/models/models';
 // Create axios instance with proxy
 const axiosInstance = axios.create({ baseURL: process.env.VUE_APP_HTTP_PROXY });
-// Injection key for useStore() to be used in Vue components
+// Injection key, so useStore() hook can be used in Vue components
 export const key: InjectionKey<Store<State>> = Symbol();
 
 export const store = createStore<State>({
@@ -37,7 +37,7 @@ export const store = createStore<State>({
     sort: '',
   },
 
-  // Mutations to set the keys in state object, type checked
+  // Mutations to set the key/values in state object, type checked
   mutations: {
     setTasks(state, tasksFromServer: Task[]) {
       state.tasks = tasksFromServer;
@@ -53,7 +53,7 @@ export const store = createStore<State>({
   // Async actions that trigger routes to the server
   actions: {
     // Fetches all tasks from db. If sort is present in state, sends it along to 
-    // server to trigger different SQL queries
+    // server to trigger different SQL "ORDER BY" queries
     fetchTasks({ commit }, sort: string) {
       const whichRoute = sort ? `/api/todos/sort/${sort}` : '/api/todos';
       axiosInstance
@@ -68,7 +68,7 @@ export const store = createStore<State>({
         .then((response) => commit('setOneTask', response.data))
         .catch((err) => console.log('Error in fetchOneTask', err));
     },
-    // Add a new task to db
+    // Adds a new task to db
     addTask({ dispatch }, task: NewTask) {
       axiosInstance
         .post('/api/todos/add', task)

@@ -80,16 +80,17 @@
       </tbody>
     </table>
   </div>
-  <EditDialog v-model:dialogOpen="dialogOpen" />
+  <edit-dialog v-model:dialogOpen="dialogOpen" />
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive } from 'vue';
 import { DateTime } from 'luxon';
 import { useStore } from '@/store/store';
+// Interfaces for type checking
 import { IdSort, IdSortPriority } from '@/models/models';
 // Components
-import EditDialog from '../EditDialog/EditDialog.vue';
+import EditDialog from './EditDialog.vue';
 
 export default defineComponent({
   name: 'TaskList',
@@ -98,22 +99,29 @@ export default defineComponent({
     const store = useStore();
     const dialogOpen = reactive({ open: false });
     onMounted(() => store.dispatch('fetchTasks'));
+
     return {
       dialogOpen,
       tasks: computed(() => store.state.tasks),
       sort: computed(() => store.state.sort),
+      // Sets string for 'sort' in state, and triggers corresponding GET route
       selectSort: (newSort: string) => {
         store.commit('setSort', newSort);
         store.dispatch('fetchTasks', newSort);
       },
+      // Deletes task from db
       deleteTask: (idDelete: IdSort) => store.dispatch('deleteTask', idDelete),
+      // Toggles done status of task on db
       toggleDone: (idDone: IdSort) => store.dispatch('toggleDoneTask', idDone),
+      // Opens EditDialog and fetches task to edit from db, sets it in state
       showDialog: (id: number) => {
         dialogOpen.open = true;
         store.dispatch('fetchOneTask', id);
       },
+      // Toggles task priority on db
       toggleTaskPriority: (idPriority: IdSortPriority) =>
         store.dispatch('toggleTaskPriority', idPriority),
+      // Formats displayed date using luxon
       formatDate: (date: string) =>
         date ? DateTime.fromISO(date).toFormat('LLL d') : '',
     };

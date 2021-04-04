@@ -44,9 +44,11 @@ export default defineComponent({
   name: 'NewTaskForm',
   setup() {
     const store = useStore();
+    // Reactive object which holds new task info
     const enteredTask = reactive({ task: '', due_date: '', priority: '' });
     return {
       enteredTask,
+      // Sends new task for POST route to server, resets values of enteredTask
       addTask: (task: NewTask) => {
         store.dispatch('addTask', task);
         enteredTask.task = '';

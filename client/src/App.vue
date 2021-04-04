@@ -1,11 +1,11 @@
 <template>
-  <NewTaskForm />
+  <new-task-form />
   <router-view />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import NewTaskForm from '@/components/NewTaskForm/NewTaskForm.vue';
+import NewTaskForm from '@/components/NewTaskForm.vue';
 
 export default defineComponent({
   name: 'App',

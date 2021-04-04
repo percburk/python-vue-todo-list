@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import TaskList from '@/components/TaskList/TaskList.vue'
+import TaskList from '@/components/TaskList.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
