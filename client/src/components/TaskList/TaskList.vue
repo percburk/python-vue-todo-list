@@ -106,16 +106,18 @@ export default defineComponent({
         store.commit('setSort', newSort);
         store.dispatch('fetchTasks', newSort);
       },
-      deleteTask: (arg: IdSort) => store.dispatch('deleteTask', arg),
-      toggleDone: (arg: IdSort) => store.dispatch('toggleDoneTask', arg),
+      deleteTask: (idDelete: IdSort) => store.dispatch('deleteTask', idDelete),
+      toggleDone: (idDone: IdSort) => store.dispatch('toggleDoneTask', idDone),
       showDialog: (id: number) => {
         dialogOpen.open = true;
         store.dispatch('fetchOneTask', id);
       },
-      toggleTaskPriority: (arg: IdSortPriority) =>
-        store.dispatch('toggleTaskPriority', arg),
-      formatDate: (date: string) =>
-        date ? DateTime.fromRFC2822(date).toFormat('LLL d') : '',
+      toggleTaskPriority: (idPriority: IdSortPriority) =>
+        store.dispatch('toggleTaskPriority', idPriority),
+      formatDate: (date: string) => {
+        console.log(date);
+        return date ? DateTime.fromISO(date).toFormat('LLL d') : '';
+      },
     };
   },
 });

@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, make_response
+from datetime import datetime
 from flask_cors import CORS
 import os
 import pg8000
@@ -12,7 +13,7 @@ CORS(app)
 
 # GET route for todo table with sorting
 @app.route("/api/todos/", defaults={'sort': None}, methods=["GET"])
-@app.route("/api/todos/<sort>", methods=["GET"])
+@app.route("/api/todos/sort/<sort>", methods=["GET"])
 def todos(sort):
     conn = pg8000.dbapi.connect(
         user=os.getenv("POSTGRES_USER"),
@@ -24,7 +25,8 @@ def todos(sort):
         sql_text = 'SELECT * FROM "todos" ORDER BY "done", "task", "due_date";'
     elif sort == "priority":
         sql_text = """
-            SELECT * FROM "todos" ORDER BY "done", "priority" DESC, "task";
+            SELECT * FROM "todos" 
+            ORDER BY "done", "priority" DESC, "due_date", "task";
         """
     else:
         sql_text = 'SELECT * FROM "todos" ORDER BY "done", "due_date", "task";'
@@ -32,11 +34,13 @@ def todos(sort):
     cur.execute(sql_text)
     rows = cur.fetchall()
     keys = [k[0] for k in cur.description]
-    results = jsonify([dict(zip(keys, row)) for row in rows])
+    results = [dict(zip(keys, row)) for row in rows]
+    for item in results:
+        item["due_date"] = item["due_date"].isoformat()
     conn.commit()
-    return results
+    return jsonify(results)
 
-
+# Add a new task to the db
 @app.route("/api/todos/add", methods=["POST"])
 def add_task():
     conn = pg8000.dbapi.connect(
@@ -59,7 +63,7 @@ def add_task():
     return make_response("Created", 201)
 
 
-# DELETE route to delete a task, PUT route for toggling done status of task
+# One task manipulation - delete, toggle done status, get one task for editing
 @app.route("/api/todos/<id>", methods=["DELETE", "PUT", "GET"])
 def delete_complete_todo(id):
     conn = pg8000.dbapi.connect(
@@ -88,7 +92,7 @@ def delete_complete_todo(id):
         return results
 
 
-# PUT route to toggle task priority
+# Toggle task priority
 @app.route("/api/todos/priority", methods=["PUT"])
 def toggle_task_priority():
     task_id = request.get_json()["id"]
@@ -112,7 +116,7 @@ def toggle_task_priority():
     conn.commit()
     return make_response('Updated', 200)
 
-
+# Edit all aspects of a task
 @app.route("/api/todos/edit", methods=["PUT"])
 def edit_task():
     task_to_edit = request.get_json()
