@@ -114,10 +114,8 @@ export default defineComponent({
       },
       toggleTaskPriority: (idPriority: IdSortPriority) =>
         store.dispatch('toggleTaskPriority', idPriority),
-      formatDate: (date: string) => {
-        console.log(date);
-        return date ? DateTime.fromISO(date).toFormat('LLL d') : '';
-      },
+      formatDate: (date: string) =>
+        date ? DateTime.fromISO(date).toFormat('LLL d') : '',
     };
   },
 });

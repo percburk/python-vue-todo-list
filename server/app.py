@@ -22,25 +22,24 @@ def todos(sort):
     cur = conn.cursor()
 
     if sort == "task":
-        sql_text = 'SELECT * FROM "todos" ORDER BY "done", "task", "due_date";'
+        sort_text = '"done", "task", "due_date";'
     elif sort == "priority":
-        sql_text = """
-            SELECT * FROM "todos" 
-            ORDER BY "done", "priority" DESC, "due_date", "task";
-        """
+        sort_text = '"done", "priority" DESC, "due_date", "task";'
     else:
-        sql_text = 'SELECT * FROM "todos" ORDER BY "done", "due_date", "task";'
+        sort_text = '"done", "due_date", "task";'
 
-    cur.execute(sql_text)
+    cur.execute(f'SELECT * FROM "todos" ORDER BY {sort_text}')
     rows = cur.fetchall()
     keys = [k[0] for k in cur.description]
     results = [dict(zip(keys, row)) for row in rows]
-    for item in results:
-        item["due_date"] = item["due_date"].isoformat()
+    for row in results:
+        row["due_date"] = row["due_date"].isoformat()
     conn.commit()
     return jsonify(results)
 
 # Add a new task to the db
+
+
 @app.route("/api/todos/add", methods=["POST"])
 def add_task():
     conn = pg8000.dbapi.connect(
@@ -50,11 +49,11 @@ def add_task():
     cur = conn.cursor()
 
     new_task = request.get_json()
-    query = """
+    sql_text = """
         INSERT INTO "todos" ("task", "due_date", "priority")
         VALUES (%s, %s, %s);
     """
-    cur.execute(query, (
+    cur.execute(sql_text, (
         new_task["task"],
         new_task["due_date"],
         new_task["priority"]
@@ -87,9 +86,10 @@ def delete_complete_todo(id):
         cur.execute('SELECT * FROM "todos" WHERE "id" = %s;', (id,))
         rows = cur.fetchall()
         keys = [k[0] for k in cur.description]
-        results = jsonify(dict(zip(keys, rows[0])))
+        results = dict(zip(keys, rows[0]))
+        results["due_date"] = results["due_date"].isoformat()
         conn.commit()
-        return results
+        return jsonify(results)
 
 
 # Toggle task priority
@@ -117,6 +117,8 @@ def toggle_task_priority():
     return make_response('Updated', 200)
 
 # Edit all aspects of a task
+
+
 @app.route("/api/todos/edit", methods=["PUT"])
 def edit_task():
     task_to_edit = request.get_json()
