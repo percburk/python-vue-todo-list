@@ -37,9 +37,8 @@ def todos(sort):
     conn.commit()
     return jsonify(results)
 
+
 # Add a new task to the db
-
-
 @app.route("/api/todos/add", methods=["POST"])
 def add_task():
     conn = pg8000.dbapi.connect(
@@ -116,9 +115,8 @@ def toggle_task_priority():
     conn.commit()
     return make_response('Updated', 200)
 
+
 # Edit all aspects of a task
-
-
 @app.route("/api/todos/edit", methods=["PUT"])
 def edit_task():
     task_to_edit = request.get_json()

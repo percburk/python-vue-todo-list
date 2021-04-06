@@ -50,18 +50,17 @@ export default defineComponent({
   props: ['dialogOpen'],
   setup(props) {
     const store = useStore();
+    const sort = computed(() => store.state.sort);
+    const oneTask = computed(() => store.state.oneTask);
     // Reactive object prop from TaskList, triggers open/close of dialog
-    let { open } = toRefs(props.dialogOpen);
+    const { open } = toRefs(props.dialogOpen);
 
-    return {
-      open,
-      sort: computed(() => store.state.sort),
-      oneTask: computed(() => store.state.oneTask),
-      // Sends edited task info for PUT route to server
-      editTask: (editedTask: TaskSort) => {
-        store.dispatch('editTask', editedTask);
-      },
+    // Sends edited task info for PUT route to server
+    const editTask = (editedTask: TaskSort) => {
+      store.dispatch('editTask', editedTask);
     };
+
+    return { open, sort, oneTask, editTask };
   },
 });
 </script>

@@ -98,32 +98,51 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const dialogOpen = reactive({ open: false });
+    const tasks = computed(() => store.state.tasks);
+    const sort = computed(() => store.state.sort);
     onMounted(() => store.dispatch('fetchTasks'));
+
+    // Sets string for 'sort' in state, and triggers corresponding GET route
+    const selectSort = (newSort: string) => {
+      store.commit('setSort', newSort);
+      store.dispatch('fetchTasks', newSort);
+    };
+
+    // Deletes task from db
+    const deleteTask = (idDelete: IdSort) => {
+      store.dispatch('deleteTask', idDelete);
+    };
+
+    // Toggles done status of task on db
+    const toggleDone = (idDone: IdSort) => {
+      store.dispatch('toggleDoneTask', idDone);
+    };
+
+    // Opens EditDialog and fetches task to edit from db, sets it in state
+    const showDialog = (id: number) => {
+      dialogOpen.open = true;
+      store.dispatch('fetchOneTask', id);
+    };
+
+    // Toggles task priority on db
+    const toggleTaskPriority = (idPriority: IdSortPriority) => {
+      store.dispatch('toggleTaskPriority', idPriority);
+    };
+
+    const formatDate = (date: string) => {
+      return date ? DateTime.fromISO(date).toFormat('LLL d') : '';
+    };
 
     return {
       dialogOpen,
-      tasks: computed(() => store.state.tasks),
-      sort: computed(() => store.state.sort),
-      // Sets string for 'sort' in state, and triggers corresponding GET route
-      selectSort: (newSort: string) => {
-        store.commit('setSort', newSort);
-        store.dispatch('fetchTasks', newSort);
-      },
-      // Deletes task from db
-      deleteTask: (idDelete: IdSort) => store.dispatch('deleteTask', idDelete),
-      // Toggles done status of task on db
-      toggleDone: (idDone: IdSort) => store.dispatch('toggleDoneTask', idDone),
-      // Opens EditDialog and fetches task to edit from db, sets it in state
-      showDialog: (id: number) => {
-        dialogOpen.open = true;
-        store.dispatch('fetchOneTask', id);
-      },
-      // Toggles task priority on db
-      toggleTaskPriority: (idPriority: IdSortPriority) =>
-        store.dispatch('toggleTaskPriority', idPriority),
-      // Formats displayed date using luxon
-      formatDate: (date: string) =>
-        date ? DateTime.fromISO(date).toFormat('LLL d') : '',
+      tasks,
+      sort,
+      selectSort,
+      deleteTask,
+      toggleDone,
+      showDialog,
+      toggleTaskPriority,
+      formatDate,
     };
   },
 });
