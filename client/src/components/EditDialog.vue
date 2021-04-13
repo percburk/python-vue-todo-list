@@ -56,7 +56,7 @@ export default defineComponent({
     const { open } = toRefs(props.dialogOpen);
 
     // Sends edited task info for PUT route to server
-    const editTask = (editedTask: TaskSort) => {
+    const editTask = (editedTask: TaskSort): void => {
       store.dispatch('editTask', editedTask);
     };
 

@@ -15,7 +15,7 @@ export interface TaskSort extends Task {
 export interface NewTask {
   task: string;
   priority: string;
-  due_date: Date;
+  due_date?: Date;
 }
 // Type check for all routes requiring the task id to send in URL to the
 // server, checks if a sort is present to trigger the correct GET in fetchTasks
