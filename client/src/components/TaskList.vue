@@ -8,22 +8,36 @@
             <el-button type="text" @click="selectSort('task')">
               <i class="el-icon-notebook-2 icon-large" />
             </el-button>
-            <i v-if="sort === 'task'" class="el-icon-top" />
-            <i v-else-if="sort === 'taskDown'" class="el-icon-bottom" />
+            <i v-if="sort === 'task'" class="el-icon-arrow-up" />
+            <i v-else-if="sort === 'task-down'" class="el-icon-arrow-down" />
           </th>
           <th>
-            <el-button type="text" @click="selectSort('date')">
-              <i class="el-icon-date icon-large" />
-            </el-button>
-            <i v-if="sort === 'date'" class="el-icon-top" />
-            <i v-else-if="sort === 'dateDown'" class="el-icon-bottom" />
+            <div class="icon-container">
+              <div class="icon-div">
+                <el-button type="text" @click="selectSort('date')">
+                  <i class="el-icon-date icon-large" />
+                </el-button>
+                <i v-if="sort === 'date'" class="el-icon-arrow-up" />
+                <i
+                  v-else-if="sort === 'date-down'"
+                  class="el-icon-arrow-down"
+                />
+              </div>
+            </div>
           </th>
           <th>
-            <el-button type="text" @click="selectSort('priority')">
-              <i class="el-icon-plus icon-large" />
-            </el-button>
-            <i v-if="sort === 'priority'" class="el-icon-top" />
-            <i v-else-if="sort === 'priorityDown'" class="el-icon-bottom" />
+            <div class="icon-container">
+              <div class="icon-div">
+                <el-button type="text" @click="selectSort('priority')">
+                  <i class="el-icon-plus icon-large" />
+                </el-button>
+                <i v-if="sort === 'priority'" class="el-icon-arrow-up" />
+                <i
+                  v-else-if="sort === 'priority-down'"
+                  class="el-icon-arrow-down"
+                />
+              </div>
+            </div>
           </th>
           <th></th>
         </tr>
@@ -33,14 +47,16 @@
           <td class="done-cell">
             <el-button
               size="small"
-              :type="task.done ? `success` : `default`"
+              :type="task.done ? 'success' : 'default'"
               icon="el-icon-check"
               round
               @click="toggleDone({ sort, id: task.id })"
             />
           </td>
           <td class="task-cell">{{ task.task }}</td>
-          <td class="date-icon-cell">{{ formatDate(task.due_date) }}</td>
+          <td :class="`date-icon-cell ${dueDateClass(task.due_date)}`">
+            {{ formatDate(task.due_date) }}
+          </td>
           <td class="date-icon-cell">
             <el-button
               size="small"
@@ -98,15 +114,16 @@ export default defineComponent({
   components: { EditDialog },
   setup() {
     const store = useStore();
-    const dialogOpen = reactive({ open: false });
     const tasks = computed(() => store.state.tasks);
     const sort = computed(() => store.state.sort);
+    const dialogOpen = reactive({ open: false });
+
     onMounted(() => store.dispatch('fetchTasks'));
 
     // Sets string for 'sort' in state, and triggers corresponding GET route
     const selectSort = (clickedSort: string): void => {
       const newSort: string =
-        clickedSort === sort.value ? `${clickedSort}Down` : clickedSort;
+        clickedSort === sort.value ? `${clickedSort}-down` : clickedSort;
       store.commit('setSort', newSort);
       store.dispatch('fetchTasks', newSort);
     };
@@ -132,8 +149,43 @@ export default defineComponent({
       store.dispatch('toggleTaskPriority', idPriority);
     };
 
+    // Formats date to 'Feb 3' string, or 'Today', 'Tomorrow', or 'Yesterday'
     const formatDate = (date: string): string => {
-      return date ? DateTime.fromISO(date).toFormat('LLL d') : '';
+      if (date) {
+        const dueDateInterval = Math.ceil(
+          DateTime.fromISO(date)
+            .diffNow('days')
+            .as('days')
+        );
+        switch (dueDateInterval) {
+          case 0:
+            return 'Today';
+          case 1:
+            return 'Tomorrow';
+          case -1:
+            return 'Yesterday';
+          default:
+            return DateTime.fromISO(date).toFormat('LLL d');
+        }
+      } else {
+        return '';
+      }
+    };
+
+    // Adds class to display text red if task is overdue
+    const dueDateClass = (date: string): string => {
+      if (date) {
+        const dueDateInterval = Math.ceil(
+          DateTime.fromISO(date)
+            .diffNow('days')
+            .as('days')
+        );
+        return dueDateInterval < 0
+          ? 'past-due'
+          : '';
+      } else {
+        return '';
+      }
     };
 
     return {
@@ -146,6 +198,7 @@ export default defineComponent({
       showDialog,
       toggleTaskPriority,
       formatDate,
+      dueDateClass,
     };
   },
 });
@@ -156,15 +209,22 @@ export default defineComponent({
   display: flex;
   justify-content: center;
 }
-.task-table {
-  width: 600px;
-}
 .task-cell {
   width: 300px;
   text-align: left;
 }
+.icon-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+.icon-div {
+  width: 51px;
+  text-align: left;
+}
 .date-icon-cell {
-  width: 50px;
+  width: 80px;
+  text-align: center;
+  box-sizing: border-box;
 }
 .done-cell {
   width: 60px;
@@ -174,5 +234,9 @@ export default defineComponent({
 }
 .icon-large {
   font-size: 1.5em;
+  margin-right: 5px;
+}
+.past-due {
+  color: red;
 }
 </style>

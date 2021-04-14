@@ -4,7 +4,7 @@ export interface Task {
   task: string;
   done: boolean;
   priority: string;
-  due_date?: Date;
+  due_date?: string;
 }
 // TaskSort is used in EditDialog to know if a sort is present to trigger the
 // correct GET route in fetchTasks, type checks the edit with Task interface

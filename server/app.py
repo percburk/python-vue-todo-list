@@ -21,20 +21,18 @@ def todos(sort):
     )
     cur = conn.cursor()
 
-    if sort == "task" or sort == "taskDown":
+    if sort == "task" or sort == "task-down":
         sort_text = f"""
-            "done", "task" {"DESC" if sort == "taskDown" else ""}, "due_date";
+            "done", "task" {"DESC" if sort == "task-down" else ""}, "due_date";
         """
-    elif sort == "priority" or sort == "priorityDown":
+    elif sort == "priority" or sort == "priority-down":
         sort_text = f"""
-            "done", 
-            "priority" {"ASC" if sort == "priorityDown" else "DESC"}, 
-            "due_date", 
-            "task";
+            "done", "priority" {"ASC" if sort == "priority-down" else "DESC"}, 
+            "due_date", "task";
         """
     else:
         sort_text = f"""
-            "done", "due_date" {"DESC" if sort == "dateDown" else ""}, "task";
+            "done", "due_date" {"DESC" if sort == "date-down" else ""}, "task";
         """
 
     cur.execute(f'SELECT * FROM "todos" ORDER BY {sort_text}')
