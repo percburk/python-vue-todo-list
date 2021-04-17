@@ -1,15 +1,16 @@
 <template>
   <div class="form-container">
-    <div class="input-container">
+    <div class="row-1-container">
       <el-input
         class="task-input"
         placeholder="New Task"
         v-model="enteredTask.task"
       />
     </div>
-    <div class="date-priority-button">
-      <div class="priority-select">
+    <div class="row-2-container">
+      <div class="date-priority-button-container">
         <el-select
+          class="priority-select"
           name="priority"
           placeholder="Priority"
           v-model="enteredTask.priority"
@@ -18,17 +19,19 @@
           <el-option value="!!" label="!!" />
           <el-option value="!!!" label="!!!" />
         </el-select>
-      </div>
-      <div class="date-picker">
         <el-date-picker
+          class="date-picker"
           type="date"
           placeholder="Due Date"
           v-model="enteredTask.due_date"
         />
-      </div>
-      <div class="submit-button">
-        <el-button type="primary" round @click="addTask(enteredTask)">
+        <el-button
+          class="submit-button"
+          type="primary"
+          @click="addTask(enteredTask)"
+        >
           Add
+          <i class="el-icon-plus" />
         </el-button>
       </div>
     </div>
@@ -65,31 +68,36 @@ export default defineComponent({
 </script>
 
 <style>
+.date-picker {
+  width: 220px;
+}
+.date-priority-button-container {
+  display: flex;
+  width: 450px;
+  justify-content: space-between;
+}
 .form-container {
-  margin: 10px;
-  padding-bottom: 40px;
-}
-.input-container {
-  display: flex;
-  justify-content: center;
-  margin: 10px;
-}
-.task-input {
-  max-width: 400px;
-}
-.date-priority-button {
-  display: flex;
-  justify-content: center;
+  padding: 20px;
+  margin-bottom: 40px;
+  background-color: #baffff;
 }
 .priority-select {
   width: 100px;
-  margin: 0px 10px;
 }
-.date-picker {
-  width: 220px;
-  margin: 0px 10px;
+.row-1-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.row-2-container {
+  display: flex;
+  justify-content: center;
+}
+.task-input {
+  max-width: 450px;
 }
 .submit-button {
-  margin: 0px 10px;
+  width: 100px;
+  height: 40px;
 }
 </style>

@@ -8,22 +8,11 @@
             <el-button type="text" @click="selectSort('task')">
               <i class="el-icon-notebook-2 icon-large" />
             </el-button>
-            <i v-if="sort === 'task'" class="el-icon-arrow-up" />
-            <i v-else-if="sort === 'task-down'" class="el-icon-arrow-down" />
-          </th>
-          <th>
-            <div class="icon-container">
-              <div class="icon-div">
-                <el-button type="text" @click="selectSort('date')">
-                  <i class="el-icon-date icon-large" />
-                </el-button>
-                <i v-if="sort === 'date'" class="el-icon-arrow-up" />
-                <i
-                  v-else-if="sort === 'date-down'"
-                  class="el-icon-arrow-down"
-                />
-              </div>
-            </div>
+            <i v-if="sort === 'task'" class="el-icon-arrow-up arrow-color" />
+            <i
+              v-else-if="sort === 'task-down'"
+              class="el-icon-arrow-down arrow-color"
+            />
           </th>
           <th>
             <div class="icon-container">
@@ -31,19 +20,44 @@
                 <el-button type="text" @click="selectSort('priority')">
                   <i class="el-icon-plus icon-large" />
                 </el-button>
-                <i v-if="sort === 'priority'" class="el-icon-arrow-up" />
+                <i
+                  v-if="sort === 'priority'"
+                  class="el-icon-arrow-up arrow-color"
+                />
                 <i
                   v-else-if="sort === 'priority-down'"
-                  class="el-icon-arrow-down"
+                  class="el-icon-arrow-down arrow-color"
                 />
               </div>
             </div>
           </th>
-          <th></th>
+          <th>
+            <div class="icon-container">
+              <div class="icon-div">
+                <el-button type="text" @click="selectSort('date')">
+                  <i class="el-icon-date icon-large" />
+                </el-button>
+                <i
+                  v-if="sort === 'date'"
+                  class="el-icon-arrow-up arrow-color"
+                />
+                <i
+                  v-else-if="sort === 'date-down'"
+                  class="el-icon-arrow-down arrow-color"
+                />
+              </div>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="task in tasks" :key="task.id">
+        <tr
+          class="table-row"
+          v-for="task in tasks"
+          :key="task.id"
+          @mouseover="hover = task.id"
+          @mouseleave="hover = false"
+        >
           <td class="done-cell">
             <el-button
               size="small"
@@ -54,9 +68,6 @@
             />
           </td>
           <td class="task-cell">{{ task.task }}</td>
-          <td :class="`date-icon-cell ${dueDateClass(task.due_date)}`">
-            {{ formatDate(task.due_date) }}
-          </td>
           <td class="date-icon-cell">
             <el-button
               size="small"
@@ -73,11 +84,13 @@
               {{ task.priority }}
             </el-button>
           </td>
-          <td class="edit-delete-cell">
+          <td :class="`date-icon-cell ${dueDateCSS(task.due_date)}`">
+            {{ formatDate(task.due_date) }}
+          </td>
+          <div v-if="hover === task.id && !task.done">
             <el-button-group>
               <el-button
                 size="small"
-                type="primary"
                 icon="el-icon-edit"
                 round
                 :disabled="task.done"
@@ -85,14 +98,13 @@
               />
               <el-button
                 size="small"
-                type="danger"
                 icon="el-icon-delete"
                 round
                 :disabled="task.done"
                 @click="deleteTask({ sort, id: task.id })"
               />
             </el-button-group>
-          </td>
+          </div>
         </tr>
       </tbody>
     </table>
@@ -101,7 +113,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, reactive } from 'vue';
+import { defineComponent, computed, onMounted, reactive, ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useStore } from '@/store/store';
 // Interfaces for type checking
@@ -117,6 +129,7 @@ export default defineComponent({
     const tasks = computed(() => store.state.tasks);
     const sort = computed(() => store.state.sort);
     const dialogOpen = reactive({ open: false });
+    const hover = ref(false);
 
     onMounted(() => store.dispatch('fetchTasks'));
 
@@ -173,19 +186,13 @@ export default defineComponent({
     };
 
     // Adds class to display text red if task is overdue
-    const dueDateClass = (date: string): string => {
-      if (date) {
-        const dueDateInterval = Math.ceil(
-          DateTime.fromISO(date)
-            .diffNow('days')
-            .as('days')
-        );
-        return dueDateInterval < 0
-          ? 'past-due'
-          : '';
-      } else {
-        return '';
-      }
+    const dueDateCSS = (date: string): string => {
+      const dueDateInterval = Math.ceil(
+        DateTime.fromISO(date)
+          .diffNow('days')
+          .as('days')
+      );
+      return dueDateInterval < 0 ? 'past-due' : '';
     };
 
     return {
@@ -198,13 +205,17 @@ export default defineComponent({
       showDialog,
       toggleTaskPriority,
       formatDate,
-      dueDateClass,
+      dueDateCSS,
+      hover,
     };
   },
 });
 </script>
 
 <style>
+.arrow-color {
+  color: #409eff;
+}
 .task-container {
   display: flex;
   justify-content: center;
@@ -229,14 +240,14 @@ export default defineComponent({
 .done-cell {
   width: 60px;
 }
-.edit-delete-cell {
-  width: 100px;
-}
 .icon-large {
   font-size: 1.5em;
   margin-right: 5px;
 }
 .past-due {
-  color: red;
+  color: rgb(168, 45, 45);
+}
+.table-row {
+  min-height: 40px;
 }
 </style>
