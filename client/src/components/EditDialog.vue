@@ -43,7 +43,10 @@
 <script lang="ts">
 import { defineComponent, toRefs, computed } from 'vue';
 import { useStore } from '@/store/store';
+// Interfaces
 import { TaskSort } from '@/models/models';
+// Action types enum
+import { actionTypes } from '@/models/actionTypes';
 
 export default defineComponent({
   name: 'EditDialog',
@@ -57,7 +60,7 @@ export default defineComponent({
 
     // Sends edited task info for PUT route to server
     const editTask = (editedTask: TaskSort): void => {
-      store.dispatch('editTask', editedTask);
+      store.dispatch(actionTypes.editTask, editedTask);
     };
 
     return { open, sort, oneTask, editTask };

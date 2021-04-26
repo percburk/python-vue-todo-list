@@ -116,8 +116,10 @@
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useStore } from '@/store/store';
-// Interfaces for type checking
+// Interfaces
 import { IdSort, IdSortPriority } from '@/models/models';
+// Action types enum 
+import { actionTypes } from '@/models/actionTypes';
 // Components
 import EditDialog from './EditDialog.vue';
 
@@ -131,35 +133,35 @@ export default defineComponent({
     const dialogOpen = reactive({ open: false });
     const hover = ref(false);
 
-    onMounted(() => store.dispatch('fetchTasks'));
+    onMounted(() => store.dispatch(actionTypes.fetchTasks));
 
     // Sets string for 'sort' in state, and triggers corresponding GET route
     const selectSort = (clickedSort: string): void => {
       const newSort: string =
         clickedSort === sort.value ? `${clickedSort}-down` : clickedSort;
-      store.commit('setSort', newSort);
-      store.dispatch('fetchTasks', newSort);
+      store.commit(actionTypes.setSort, newSort);
+      store.dispatch(actionTypes.fetchTasks, newSort);
     };
 
     // Deletes task from db
     const deleteTask = (idDelete: IdSort): void => {
-      store.dispatch('deleteTask', idDelete);
+      store.dispatch(actionTypes.deleteTask, idDelete);
     };
 
     // Toggles done status of task on db
     const toggleDone = (idDone: IdSort): void => {
-      store.dispatch('toggleDoneTask', idDone);
+      store.dispatch(actionTypes.toggleDoneTask, idDone);
     };
 
     // Opens EditDialog and fetches task to edit from db, sets it in state
     const showDialog = (id: number): void => {
       dialogOpen.open = true;
-      store.dispatch('fetchOneTask', id);
+      store.dispatch(actionTypes.fetchOneTask, id);
     };
 
     // Toggles task priority on db
     const toggleTaskPriority = (idPriority: IdSortPriority): void => {
-      store.dispatch('toggleTaskPriority', idPriority);
+      store.dispatch(actionTypes.toggleTaskPriority, idPriority);
     };
 
     // Formats date to 'Feb 3' string, or 'Today', 'Tomorrow', or 'Yesterday'

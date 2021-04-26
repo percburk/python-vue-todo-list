@@ -15,11 +15,22 @@ import {
   IdSort,
   TaskSort,
 } from '@/models/models';
+// Action types enum
+import { actionTypes } from '@/models/actionTypes';
+
 // Create axios instance with proxy
 const axiosInstance = axios.create({ baseURL: process.env.VUE_APP_HTTP_PROXY });
+
 // Injection key, so useStore() hook can be used in Vue components
 export const key: InjectionKey<Store<State>> = Symbol();
 
+// Custom hook that provides injection key to all instances of useStore()
+// being called in components
+export const useStore = (): Store<State> => {
+  return useBaseStore(key);
+};
+
+// Store instance
 export const store = createStore<State>({
   // Add logger to display state in console when in development mode
   plugins: process.env.NODE_ENV === 'development' ? [createLogger()] : [],
@@ -39,94 +50,94 @@ export const store = createStore<State>({
 
   // Mutations to set the key/values in state object, type checked
   mutations: {
-    setTasks(state, tasksFromServer: Task[]) {
+    [actionTypes.setTasks](state, tasksFromServer: Task[]) {
       state.tasks = tasksFromServer;
     },
-    setOneTask(state, oneTaskFromServer: Task) {
+    [actionTypes.setOneTask](state, oneTaskFromServer: Task) {
       state.oneTask = oneTaskFromServer;
     },
-    setSort(state, sort: string) {
+    [actionTypes.setSort](state, sort: string) {
       state.sort = sort;
     },
   },
 
   // Async actions that trigger routes to the server
   actions: {
-    // Fetches all tasks from db. If sort is present in state, sends it along to
-    // server to trigger different SQL "ORDER BY" queries
-    async fetchTasks({ commit }, sort: string): Promise<void> {
+    // Fetches all tasks from db. If sort is present in state, sends it along
+    // to server to trigger different SQL "ORDER BY" queries
+    async [actionTypes.fetchTasks]({ commit }, sort: string): Promise<void> {
       const whichRoute = sort ? `/api/todos/sort/${sort}` : '/api/todos';
       try {
         const response = await axiosInstance.get(whichRoute);
-        commit('setTasks', response.data);
+        commit(actionTypes.setTasks, response.data);
       } catch (err) {
-        console.log('Error in fetchTasks', err);
+        console.log('Error in fetchTasks:', err);
       }
     },
     // Fetches one task to edit in EditDialog
-    async fetchOneTask({ commit }, id: number): Promise<void> {
+    async [actionTypes.fetchOneTask]({ commit }, id: number): Promise<void> {
       try {
         const response = await axiosInstance.get(`/api/todos/${id}`);
-        commit('setOneTask', response.data);
+        commit(actionTypes.setOneTask, response.data);
       } catch (err) {
-        console.log('Error in fetchOneTask', err);
+        console.log('Error in fetchOneTask:', err);
       }
     },
     // Adds a new task to db
-    async addTask({ dispatch }, task: NewTask): Promise<void> {
+    async [actionTypes.addTask]({ dispatch }, task: NewTask): Promise<void> {
       try {
         await axiosInstance.post('/api/todos/add', task);
-        await dispatch('fetchTasks');
+        await dispatch(actionTypes.fetchTasks);
       } catch (err) {
-        console.log('Error in addTask', err);
+        console.log('Error in addTask:', err);
       }
     },
     // Sends edits of a task from EditDialog to db
-    async editTask({ dispatch }, task: TaskSort): Promise<void> {
+    async [actionTypes.editTask]({ dispatch }, task: TaskSort): Promise<void> {
       try {
         await axiosInstance.put('/api/todos/edit', task);
-        await dispatch('fetchTasks', task.sort);
+        await dispatch(actionTypes.fetchTasks, task.sort);
       } catch (err) {
-        console.log('Error in editTask', err);
+        console.log('Error in editTask:', err);
       }
     },
     // Toggles done status of a task from TaskList
-    async toggleDoneTask({ dispatch }, sentIdSort: IdSort): Promise<void> {
+    async [actionTypes.toggleDoneTask](
+      { dispatch },
+      sentIdSort: IdSort
+    ): Promise<void> {
       const { id, sort } = sentIdSort;
       try {
         await axiosInstance.put(`/api/todos/${id}`);
-        await dispatch('fetchTasks', sort);
+        await dispatch(actionTypes.fetchTasks, sort);
       } catch (err) {
-        console.log('Error in toggleDoneTask', err);
+        console.log('Error in toggleDoneTask:', err);
       }
     },
     // Toggles priority level of task from TaskList
-    async toggleTaskPriority(
+    async [actionTypes.toggleTaskPriority](
       { dispatch },
       priorityToEdit: IdSortPriority
     ): Promise<void> {
       try {
         await axiosInstance.put('/api/todos/priority', priorityToEdit);
-        await dispatch('fetchTasks', priorityToEdit.sort);
+        await dispatch(actionTypes.fetchTasks, priorityToEdit.sort);
       } catch (err) {
-        console.log('Error in toggleTaskPriority', err);
+        console.log('Error in toggleTaskPriority:', err);
       }
     },
     // Deletes a task from the db
-    async deleteTask({ dispatch }, sentIdSort: IdSort): Promise<void> {
+    async [actionTypes.deleteTask](
+      { dispatch },
+      sentIdSort: IdSort
+    ): Promise<void> {
       const { id, sort } = sentIdSort;
       try {
         await axiosInstance.delete(`/api/todos/${id}`);
-        await dispatch('fetchTasks', sort);
+        await dispatch(actionTypes.fetchTasks, sort);
       } catch (err) {
-        console.log('Error in deleteTask', err);
+        console.log('Error in deleteTask:', err);
       }
     },
   },
 });
-
-// Custom hook that provides injection key to all instances of useStore()
-// being called in components
-export function useStore(): Store<State> {
-  return useBaseStore(key);
-}

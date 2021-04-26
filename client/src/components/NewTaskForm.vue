@@ -4,7 +4,7 @@
       <el-input
         class="task-input"
         placeholder="New Task"
-        v-model="enteredTask.task"
+        v-model="task"
       />
     </div>
     <div class="row-2-container">
@@ -13,7 +13,7 @@
           class="priority-select"
           name="priority"
           placeholder="Priority"
-          v-model="enteredTask.priority"
+          v-model="priority"
         >
           <el-option value="!" label="!" />
           <el-option value="!!" label="!!" />
@@ -23,12 +23,12 @@
           class="date-picker"
           type="date"
           placeholder="Due Date"
-          v-model="enteredTask.due_date"
+          v-model="due_date"
         />
         <el-button
           class="submit-button"
           type="primary"
-          @click="addTask(enteredTask)"
+          @click="addTask()"
         >
           Add
           <i class="el-icon-plus" />
@@ -39,9 +39,12 @@
 </template>
 
 <script lang="ts">
-import { reactive, defineComponent } from 'vue';
+import { reactive, defineComponent, toRefs } from 'vue';
 import { useStore } from '@/store/store';
+// Interfaces
 import { NewTask } from '@/models/models';
+// Action type enum
+import { actionTypes } from '@/models/actionTypes';
 
 export default defineComponent({
   name: 'NewTaskForm',
@@ -55,14 +58,14 @@ export default defineComponent({
     });
 
     // Sends new task for POST route to server, resets values of enteredTask
-    const addTask = (task: NewTask): void => {
-      store.dispatch('addTask', task);
+    const addTask = (): void => {
+      store.dispatch(actionTypes.addTask, enteredTask);
       enteredTask.task = '';
       enteredTask.due_date = undefined;
       enteredTask.priority = '';
     };
 
-    return { enteredTask, addTask };
+    return { ...toRefs(enteredTask), addTask };
   },
 });
 </script>

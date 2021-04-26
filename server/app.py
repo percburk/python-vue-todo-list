@@ -4,7 +4,6 @@ from flask_cors import CORS
 import os
 import pg8000
 
-
 # Start app, add CORS to all routes
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -12,14 +11,13 @@ CORS(app)
 
 
 # GET route for todo table with sorting
-@app.route("/api/todos/", defaults={'sort': None}, methods=["GET"])
+@app.route("/api/todos/", defaults={"sort": None}, methods=["GET"])
 @app.route("/api/todos/sort/<sort>", methods=["GET"])
 def todos(sort):
-    conn = pg8000.dbapi.connect(
-        user=os.getenv("POSTGRES_USER"),
-        database="python_vue_todo"
+    connection = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"), database="python_vue_todo"
     )
-    cur = conn.cursor()
+    cursor = connection.cursor()
 
     if sort == "task" or sort == "task-down":
         sort_text = f"""
@@ -27,7 +25,7 @@ def todos(sort):
         """
     elif sort == "priority" or sort == "priority-down":
         sort_text = f"""
-            "done", "priority" {"ASC" if sort == "priority-down" else "DESC"}, 
+            "done", "priority" {"ASC" if sort == "priority-down" else "DESC"},
             "due_date", "task";
         """
     else:
@@ -35,66 +33,62 @@ def todos(sort):
             "done", "due_date" {"DESC" if sort == "date-down" else ""}, "task";
         """
 
-    cur.execute(f'SELECT * FROM "todos" ORDER BY {sort_text}')
-    rows = cur.fetchall()
-    keys = [k[0] for k in cur.description]
+    cursor.execute(f'SELECT * FROM "todos" ORDER BY {sort_text}')
+    rows = cursor.fetchall()
+    keys = [k[0] for k in cursor.description]
     results = [dict(zip(keys, row)) for row in rows]
     for row in results:
         row["due_date"] = row["due_date"].isoformat()
-    conn.commit()
+    connection.commit()
     return jsonify(results)
 
 
 # Add a new task to the db
 @app.route("/api/todos/add", methods=["POST"])
 def add_task():
-    conn = pg8000.dbapi.connect(
-        user=os.getenv("POSTGRES_USER"),
-        database="python_vue_todo"
+    connection = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"), database="python_vue_todo"
     )
-    cur = conn.cursor()
-
+    cursor = connection.cursor()
     new_task = request.get_json()
     sql_text = """
         INSERT INTO "todos" ("task", "due_date", "priority")
         VALUES (%s, %s, %s);
     """
-    cur.execute(sql_text, (
-        new_task["task"],
-        new_task["due_date"],
-        new_task["priority"]
-    ))
-    conn.commit()
+    cursor.execute(
+        sql_text,
+        (new_task["task"], new_task["due_date"], new_task["priority"])
+    )
+    connection.commit()
     return make_response("Created", 201)
 
 
 # One task manipulation - delete, toggle done status, get one task for editing
 @app.route("/api/todos/<id>", methods=["DELETE", "PUT", "GET"])
 def delete_complete_todo(id):
-    conn = pg8000.dbapi.connect(
-        user=os.getenv("POSTGRES_USER"),
-        database="python_vue_todo"
+    connection = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"), database="python_vue_todo"
     )
-    cur = conn.cursor()
+    cursor = connection.cursor()
 
     if request.method == "DELETE":
-        cur.execute('DELETE FROM "todos" WHERE "id" = %s;', (id,))
-        conn.commit()
+        cursor.execute('DELETE FROM "todos" WHERE "id" = %s;', (id, ))
+        connection.commit()
         return make_response("Deleted", 204)
 
     elif request.method == "PUT":
         sql_text = 'UPDATE "todos" SET "done" = NOT "done" WHERE "id" = %s;'
-        cur.execute(sql_text, (id,))
-        conn.commit()
+        cursor.execute(sql_text, (id, ))
+        connection.commit()
         return make_response("Updated", 200)
 
     else:
-        cur.execute('SELECT * FROM "todos" WHERE "id" = %s;', (id,))
-        rows = cur.fetchall()
-        keys = [k[0] for k in cur.description]
+        cursor.execute('SELECT * FROM "todos" WHERE "id" = %s;', (id, ))
+        rows = cursor.fetchall()
+        keys = [k[0] for k in cursor.description]
         results = dict(zip(keys, rows[0]))
         results["due_date"] = results["due_date"].isoformat()
-        conn.commit()
+        connection.commit()
         return jsonify(results)
 
 
@@ -104,11 +98,10 @@ def toggle_task_priority():
     task_id = request.get_json()["id"]
     priority = request.get_json()["priority"]
 
-    conn = pg8000.dbapi.connect(
-        user=os.getenv("POSTGRES_USER"),
-        database="python_vue_todo"
+    connection = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"), database="python_vue_todo"
     )
-    cur = conn.cursor()
+    cursor = connection.cursor()
 
     if priority == "!":
         new_priority = "!!"
@@ -118,9 +111,9 @@ def toggle_task_priority():
         new_priority = "!"
 
     sql_text = 'UPDATE "todos" SET "priority" = %s WHERE "id" = %s;'
-    cur.execute(sql_text, (new_priority, task_id))
-    conn.commit()
-    return make_response('Updated', 200)
+    cursor.execute(sql_text, (new_priority, task_id))
+    connection.commit()
+    return make_response("Updated", 200)
 
 
 # Edit all aspects of a task
@@ -128,21 +121,20 @@ def toggle_task_priority():
 def edit_task():
     task_to_edit = request.get_json()
 
-    conn = pg8000.dbapi.connect(
-        user=os.getenv("POSTGRES_USER"),
-        database="python_vue_todo"
+    connection = pg8000.dbapi.connect(
+        user=os.getenv("POSTGRES_USER"), database="python_vue_todo"
     )
-    cur = conn.cursor()
+    cursor = connection.cursor()
 
     sql_text = """
         UPDATE "todos" SET "task" = %s, "due_date" = %s, "priority" = %s
         WHERE "id" = %s;
     """
-    cur.execute(sql_text, (
-        task_to_edit["task"],
-        task_to_edit["due_date"],
-        task_to_edit["priority"],
-        task_to_edit["id"]
-    ))
-    conn.commit()
-    return make_response('Updated', 200)
+    cursor.execute(
+        sql_text, (
+            task_to_edit["task"], task_to_edit["due_date"],
+            task_to_edit["priority"], task_to_edit["id"]
+        )
+    )
+    connection.commit()
+    return make_response("Updated", 200)
