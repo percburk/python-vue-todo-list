@@ -84,8 +84,8 @@
               {{ task.priority }}
             </el-button>
           </td>
-          <td :class="`date-icon-cell ${dueDateCSS(task.due_date)}`">
-            {{ formatDate(task.due_date) }}
+          <td :class="`date-icon-cell ${task.overdue ? 'past-due' : ''}`">
+            {{ task.date_display }}
           </td>
           <div v-if="hover === task.id && !task.done">
             <el-button-group>
@@ -114,7 +114,6 @@
 
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue';
-import { DateTime } from 'luxon';
 import { useStore } from '@/store/store';
 // Interfaces
 import { IdSort, IdSortPriority } from '@/models/models';
@@ -164,39 +163,6 @@ export default defineComponent({
       store.dispatch(actionTypes.toggleTaskPriority, idPriority);
     };
 
-    // Formats date to 'Feb 3' string, or 'Today', 'Tomorrow', or 'Yesterday'
-    const formatDate = (date: string): string => {
-      if (date) {
-        const dueDateInterval = Math.ceil(
-          DateTime.fromISO(date)
-            .diffNow('days')
-            .as('days')
-        );
-        switch (dueDateInterval) {
-          case 0:
-            return 'Today';
-          case 1:
-            return 'Tomorrow';
-          case -1:
-            return 'Yesterday';
-          default:
-            return DateTime.fromISO(date).toFormat('LLL d');
-        }
-      } else {
-        return '';
-      }
-    };
-
-    // Adds class to display text red if task is overdue
-    const dueDateCSS = (date: string): string => {
-      const dueDateInterval = Math.ceil(
-        DateTime.fromISO(date)
-          .diffNow('days')
-          .as('days')
-      );
-      return dueDateInterval < 0 ? 'past-due' : '';
-    };
-
     return {
       dialogOpen,
       tasks,
@@ -206,8 +172,6 @@ export default defineComponent({
       toggleDone,
       showDialog,
       toggleTaskPriority,
-      formatDate,
-      dueDateCSS,
       hover,
     };
   },

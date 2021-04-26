@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, make_response
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from flask_cors import CORS
 import os
 import pg8000
@@ -38,6 +38,20 @@ def todos(sort):
     keys = [k[0] for k in cursor.description]
     results = [dict(zip(keys, row)) for row in rows]
     for row in results:
+        today = date.today()
+        row["overdue"] = row["due_date"] < today
+
+        if row["due_date"] == today:
+            row["date_display"] == "Today"
+        elif row["due_date"] == today + timedelta(days=1):
+            row["date_display"] = "Tomorrow"
+        elif row["due_date"] == today - timedelta(days=1):
+            row["date_display"] = "Yesterday"
+        else:
+            row["date_display"] = row["due_date"].strftime("%b %d").replace(
+                " 0", " "
+            )
+
         row["due_date"] = row["due_date"].isoformat()
     connection.commit()
     return jsonify(results)

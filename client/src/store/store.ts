@@ -44,19 +44,21 @@ export const store = createStore<State>({
       done: false,
       priority: '',
       due_date: '',
+      date_display: '',
+      overdue: '',
     },
     sort: '',
   },
 
   // Mutations to set the key/values in state object, type checked
   mutations: {
-    [actionTypes.setTasks](state, tasksFromServer: Task[]) {
+    [actionTypes.setTasks](state, tasksFromServer: Task[]): void {
       state.tasks = tasksFromServer;
     },
-    [actionTypes.setOneTask](state, oneTaskFromServer: Task) {
+    [actionTypes.setOneTask](state, oneTaskFromServer: Task): void {
       state.oneTask = oneTaskFromServer;
     },
-    [actionTypes.setSort](state, sort: string) {
+    [actionTypes.setSort](state, sort: string): void {
       state.sort = sort;
     },
   },
