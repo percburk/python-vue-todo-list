@@ -45,7 +45,7 @@ export const store = createStore<State>({
       priority: '',
       due_date: '',
       date_display: '',
-      overdue: '',
+      overdue: false,
     },
     sort: '',
   },
