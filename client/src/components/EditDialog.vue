@@ -1,31 +1,30 @@
 <template>
-  <el-dialog v-model="open">
-    <el-form>
-      <el-form-item label="Task">
-        <el-input v-model="oneTask.task" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="Priority">
-        <el-select
-          name="priority"
-          placeholder="Priority"
-          v-model="oneTask.priority"
-        >
-          <el-option value="!" label="!" />
-          <el-option value="!!" label="!!" />
-          <el-option value="!!!" label="!!!" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Due Date">
-        <el-date-picker
-          type="date"
-          placeholder="Due Date"
-          v-model="oneTask.due_date"
-        />
-      </el-form-item>
-    </el-form>
+  <v-tailwind-modal v-model="open">
+    <form>
+      <label for="task-input">Task</label>
+      <input id="task-input" v-model="oneTask.task" autocomplete="off" />
+      <label for="priority-select">Task</label>
+      <select
+        id="priority-select"
+        name="priority"
+        placeholder="Priority"
+        v-model="oneTask.priority"
+      >
+        <option value="!" label="!" />
+        <option value="!!" label="!!" />
+        <option value="!!!" label="!!!" />
+      </select>
+      <label for="date-picker">Task</label>
+      <input
+        id="date-picker"
+        type="date"
+        placeholder="Due Date"
+        v-model="oneTask.due_date"
+      />
+    </form>
     <div>
-      <el-button @click="open = false">Cancel</el-button>
-      <el-button
+      <button @click="open = false">Cancel</button>
+      <button
         type="primary"
         @click="
           () => {
@@ -35,18 +34,18 @@
         "
       >
         Confirm
-      </el-button>
+      </button>
     </div>
-  </el-dialog>
+  </v-tailwind-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, toRefs, computed } from 'vue';
-import { useStore } from '@/store/store';
+import { useStore } from '../store/store';
 // Interfaces
-import { TaskSort } from '@/models/models';
+import { TaskSort } from '../models/models';
 // Action types enum
-import { actionTypes } from '@/models/actionTypes';
+import { actionTypes } from '../models/actionTypes';
 
 export default defineComponent({
   name: 'EditDialog',

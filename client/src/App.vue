@@ -5,13 +5,25 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import NewTaskForm from '@/components/NewTaskForm.vue';
-import TaskList from '@/components/TaskList.vue';
+import TaskList from './components/TaskList.vue';
+import NewTaskForm from './components/NewTaskForm.vue';
 
 export default defineComponent({
   name: 'App',
-  components: { NewTaskForm, TaskList },
+  components: {
+    TaskList,
+    NewTaskForm,
+  },
 });
 </script>
 
-<style src="./index.css"></style>
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>

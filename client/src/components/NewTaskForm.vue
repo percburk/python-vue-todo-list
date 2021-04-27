@@ -1,38 +1,30 @@
 <template>
   <div class="form-container">
     <div class="row-1-container">
-      <el-input
-        class="task-input"
-        placeholder="New Task"
-        v-model="task"
-      />
+      <input class="task-input" placeholder="New Task" v-model="task" />
     </div>
     <div class="row-2-container">
       <div class="date-priority-button-container">
-        <el-select
+        <select
           class="priority-select"
           name="priority"
           placeholder="Priority"
           v-model="priority"
         >
-          <el-option value="!" label="!" />
-          <el-option value="!!" label="!!" />
-          <el-option value="!!!" label="!!!" />
-        </el-select>
-        <el-date-picker
+          <option value="!" label="!" />
+          <option value="!!" label="!!" />
+          <option value="!!!" label="!!!" />
+        </select>
+        <input
           class="date-picker"
           type="date"
           placeholder="Due Date"
           v-model="due_date"
         />
-        <el-button
-          class="submit-button"
-          type="primary"
-          @click="addTask()"
-        >
+        <button class="submit-button" type="primary" @click="addTask()">
           Add
-          <i class="el-icon-plus" />
-        </el-button>
+          <i class="material-icons">add</i>
+        </button>
       </div>
     </div>
   </div>
@@ -40,11 +32,11 @@
 
 <script lang="ts">
 import { reactive, defineComponent, toRefs } from 'vue';
-import { useStore } from '@/store/store';
+import { useStore } from '../store/store';
 // Interfaces
-import { NewTask } from '@/models/models';
+import { NewTask } from '../models/models';
 // Action type enum
-import { actionTypes } from '@/models/actionTypes';
+import { actionTypes } from '../models/actionTypes';
 
 export default defineComponent({
   name: 'NewTaskForm',
