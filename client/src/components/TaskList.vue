@@ -1,30 +1,28 @@
 <template>
-  <div class="container mx-auto">
-    <div class="flex">
+  <div class="container px-4 flex justify-center">
+    <div>
       <div>
         <div class="flex">
           <button @click="selectSort('task')">
-            <i class="material-icons">list</i>
+            <span class="material-icons">list</span>
           </button>
-          <i v-if="sort === 'task'" class="material-icons">
-            expand_less
-          </i>
-          <i v-else-if="sort === 'task-down'" class="material-icons">
+          <span v-if="sort === 'task'" class="material-icons">expand_less</span>
+          <span v-else-if="sort === 'task-down'" class="material-icons">
             expand_more
-          </i>
+          </span>
         </div>
       </div>
-      <div>
+      <div class="flex justify-center">
         <div class="flex">
           <button @click="selectSort('priority')">
             <span class="material-icons">add</span>
           </button>
-          <i v-if="sort === 'priority'" class="material-icons">
+          <span v-if="sort === 'priority'" class="material-icons">
             expand_less
-          </i>
-          <i v-else-if="sort === 'priority-down'" class="material-icons">
+          </span>
+          <span v-else-if="sort === 'priority-down'" class="material-icons">
             expand_more
-          </i>
+          </span>
         </div>
       </div>
       <div>
@@ -32,57 +30,51 @@
           <button @click="selectSort('date')">
             <span class="material-icons">event</span>
           </button>
-          <i v-if="sort === 'date'" class="material-icons">
-            expand_less
-          </i>
-          <i v-else-if="sort === 'date-down'" class="material-icons">
+          <span v-if="sort === 'date'" class="material-icons">expand_less</span>
+          <span v-else-if="sort === 'date-down'" class="material-icons">
             expand_more
-          </i>
+          </span>
         </div>
       </div>
-    </div>
-    <div
-      class="table-row"
-      v-for="task in tasks"
-      :key="task.id"
-      @mouseover="hover = task.id"
-      @mouseleave="hover = false"
-    >
-      <div class="done-cell">
-        <input
-          type="checkbox"
-          :checked="task.done"
-          @click="toggleDone({ sort, id: task.id })"
-        />
-      </div>
-      <div class="task-cell">{{ task.task }}</div>
-      <div class="date-icon-cell">
-        <button
-          :disabled="task.done"
-          @click="
-            toggleTaskPriority({
-              sort,
-              id: task.id,
-              priority: task.priority,
-            })
-          "
+      <div
+        class="py-2 h-10 flex relative"
+        v-for="task in tasks"
+        :key="task.id"
+        @mouseover="hover = task.id"
+        @mouseleave="hover = false"
+      >
+        <div class="done-cell">
+          <input
+            type="checkbox"
+            :checked="task.done"
+            @click="toggleDone({ sort, id: task.id })"
+          />
+        </div>
+        <div class="task-cell">{{ task.task }}</div>
+        <div class="date-icon-cell">
+          <button
+            :disabled="task.done"
+            @click="
+              toggleTaskPriority({ sort, id: task.id, priority: task.priority })
+            "
+          >
+            {{ task.priority }}
+          </button>
+        </div>
+        <div :class="`date-icon-cell ${task.overdue ? 'past-due' : ''} `">
+          {{ task.date_display }}
+        </div>
+        <div
+          v-if="hover === task.id && !task.done"
+          class="absolute bottom-0 right-20"
         >
-          {{ task.priority }}
-        </button>
-      </div>
-      <div :class="`date-icon-cell ${task.overdue ? 'past-due' : ''}`">
-        {{ task.date_display }}
-      </div>
-      <div v-if="hover === task.id && !task.done">
-        <button :disabled="task.done" @click="showDialog(task.id)">
-          <i class="material-icons">edit</i>
-        </button>
-        <button
-          :disabled="task.done"
-          @click="deleteTask({ sort, id: task.id })"
-        >
-          <i class="material-icons">close</i>
-        </button>
+          <button @click="showDialog(task.id)">
+            <span class="material-icons">edit</span>
+          </button>
+          <button @click="deleteTask({ sort, id: task.id })">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

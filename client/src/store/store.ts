@@ -23,14 +23,12 @@ export const key: InjectionKey<Store<State>> = Symbol();
 
 // Custom hook that provides injection key to all instances of useStore()
 // being called in components
-export const useStore = (): Store<State> => {
-  return useBaseStore(key);
-};
+export const useStore = (): Store<State> => useBaseStore(key);
 
 // Store instance
 export const store = createStore<State>({
   // Add logger to display state in console when in development mode
-  plugins: import.meta.env.NODE_ENV === 'development' ? [createLogger()] : [],
+  plugins: import.meta.env.DEV ? [createLogger()] : [],
 
   // Initial state
   state: {
@@ -63,7 +61,7 @@ export const store = createStore<State>({
   // Async actions that trigger routes to the server
   actions: {
     // Fetches all tasks from db. If sort is present in state, sends it along
-    // to server to trigger different SQL "ORDER BY" queries
+    // to server to trigger different SQL 'ORDER BY' queries
     async [actionTypes.fetchTasks]({ commit }, sort: string): Promise<void> {
       const whichRoute = sort ? `/api/todos/sort/${sort}` : '/api/todos';
       try {

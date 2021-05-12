@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, make_response
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from flask_cors import CORS
 import os
 import pg8000
