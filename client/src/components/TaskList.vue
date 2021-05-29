@@ -87,7 +87,7 @@ import { useStore } from '../store/store';
 // Interfaces
 import { IdSort, IdSortPriority } from '../models/models';
 // Action types enum
-import { actionTypes } from '../models/actionTypes';
+import { ActionTypes } from '../models/ActionTypes';
 // Components
 import EditDialog from './EditDialog.vue';
 
@@ -100,35 +100,35 @@ export default defineComponent({
     const dialogOpen = reactive({ open: false });
     const hover = ref(false);
 
-    onMounted(() => store.dispatch(actionTypes.fetchTasks));
+    onMounted(() => store.dispatch(ActionTypes.FETCH_TASKS));
 
     // Sets string for 'sort' in state, and triggers corresponding GET route
     const selectSort = (clickedSort: string): void => {
       const newSort: string =
         clickedSort === sort.value ? `${clickedSort}-down` : clickedSort;
-      store.commit(actionTypes.setSort, newSort);
-      store.dispatch(actionTypes.fetchTasks, newSort);
+      store.commit(ActionTypes.SET_SORT, newSort);
+      store.dispatch(ActionTypes.FETCH_TASKS, newSort);
     };
 
     // Deletes task from db
     const deleteTask = (idDelete: IdSort): void => {
-      store.dispatch(actionTypes.deleteTask, idDelete);
+      store.dispatch(ActionTypes.DELETE_TASK, idDelete);
     };
 
     // Toggles done status of task on db
     const toggleDone = (idDone: IdSort): void => {
-      store.dispatch(actionTypes.toggleDoneTask, idDone);
+      store.dispatch(ActionTypes.TOGGLE_DONE_TASK, idDone);
     };
 
     // Opens EditDialog and fetches task to edit from db, sets it in state
     const showDialog = (id: number): void => {
       dialogOpen.open = true;
-      store.dispatch(actionTypes.fetchOneTask, id);
+      store.dispatch(ActionTypes.FETCH_ONE_TASK, id);
     };
 
     // Toggles task priority on db
     const toggleTaskPriority = (idPriority: IdSortPriority): void => {
-      store.dispatch(actionTypes.toggleTaskPriority, idPriority);
+      store.dispatch(ActionTypes.TOGGLE_TASK_PRIORITY, idPriority);
     };
 
     return {

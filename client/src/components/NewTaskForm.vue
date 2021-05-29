@@ -36,7 +36,7 @@ import { useStore } from '../store/store';
 // Interfaces
 import { NewTask } from '../models/models';
 // Action type enum
-import { actionTypes } from '../models/actionTypes';
+import { ActionTypes } from '../models/ActionTypes';
 
 export default defineComponent({
   name: 'NewTaskForm',
@@ -51,7 +51,7 @@ export default defineComponent({
 
     // Sends new task for POST route to server, resets values of enteredTask
     const addTask = (): void => {
-      store.dispatch(actionTypes.addTask, enteredTask);
+      store.dispatch(ActionTypes.ADD_TASK, enteredTask);
       enteredTask.task = '';
       enteredTask.due_date = undefined;
       enteredTask.priority = '';

@@ -45,7 +45,7 @@ import { useStore } from '../store/store';
 // Interfaces
 import { TaskSort } from '../models/models';
 // Action types enum
-import { actionTypes } from '../models/actionTypes';
+import { ActionTypes } from '../models/ActionTypes';
 
 export default defineComponent({
   name: 'EditDialog',
@@ -59,7 +59,7 @@ export default defineComponent({
 
     // Sends edited task info for PUT route to server
     const editTask = (editedTask: TaskSort): void => {
-      store.dispatch(actionTypes.editTask, editedTask);
+      store.dispatch(ActionTypes.EDIT_TASK, editedTask);
     };
 
     return { open, sort, oneTask, editTask };
