@@ -48,9 +48,7 @@ def todos(sort):
         elif row["due_date"] == today - timedelta(days=1):
             row["date_display"] = "Yesterday"
         else:
-            row["date_display"] = row["due_date"].strftime("%b %d").replace(
-                " 0", " "
-            )
+            row["date_display"] = row["due_date"].strftime("%b %d").replace(" 0", " ")
 
         row["due_date"] = row["due_date"].isoformat()
     connection.commit()
@@ -70,8 +68,7 @@ def add_task():
         VALUES (%s, %s, %s);
     """
     cursor.execute(
-        sql_text,
-        (new_task["task"], new_task["due_date"], new_task["priority"])
+        sql_text, (new_task["task"], new_task["due_date"], new_task["priority"])
     )
     connection.commit()
     return make_response("Created", 201)
@@ -86,18 +83,18 @@ def delete_complete_todo(id):
     cursor = connection.cursor()
 
     if request.method == "DELETE":
-        cursor.execute('DELETE FROM "todos" WHERE "id" = %s;', (id, ))
+        cursor.execute('DELETE FROM "todos" WHERE "id" = %s;', (id,))
         connection.commit()
         return make_response("Deleted", 204)
 
     elif request.method == "PUT":
         sql_text = 'UPDATE "todos" SET "done" = NOT "done" WHERE "id" = %s;'
-        cursor.execute(sql_text, (id, ))
+        cursor.execute(sql_text, (id,))
         connection.commit()
         return make_response("Updated", 200)
 
     else:
-        cursor.execute('SELECT * FROM "todos" WHERE "id" = %s;', (id, ))
+        cursor.execute('SELECT * FROM "todos" WHERE "id" = %s;', (id,))
         rows = cursor.fetchall()
         keys = [k[0] for k in cursor.description]
         results = dict(zip(keys, rows[0]))
@@ -145,10 +142,13 @@ def edit_task():
         WHERE "id" = %s;
     """
     cursor.execute(
-        sql_text, (
-            task_to_edit["task"], task_to_edit["due_date"],
-            task_to_edit["priority"], task_to_edit["id"]
-        )
+        sql_text,
+        (
+            task_to_edit["task"],
+            task_to_edit["due_date"],
+            task_to_edit["priority"],
+            task_to_edit["id"],
+        ),
     )
     connection.commit()
     return make_response("Updated", 200)
