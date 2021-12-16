@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, request, make_response
-from datetime import timedelta, date
-from flask_cors import CORS
 import os
+from datetime import timedelta, date
+from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS
 import pg8000
 
 # Start app, add CORS to all routes
@@ -19,11 +19,11 @@ def todos(sort):
     )
     cursor = connection.cursor()
 
-    if sort == "task" or sort == "task-down":
+    if sort in ("task", "task-down"):
         sort_text = f"""
             "done", "task" {"DESC" if sort == "task-down" else ""}, "due_date";
         """
-    elif sort == "priority" or sort == "priority-down":
+    elif sort in ("priority", "priority-down"):
         sort_text = f"""
             "done", "priority" {"ASC" if sort == "priority-down" else "DESC"},
             "due_date", "task";

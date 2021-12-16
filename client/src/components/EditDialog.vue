@@ -43,19 +43,19 @@
 import { defineComponent, toRefs, computed } from 'vue';
 import { useStore } from '../store/store';
 // Interfaces
-import { TaskSort } from '../models/models';
+import { TaskSort } from '../models/TaskResource';
 // Action types enum
-import { ActionTypes } from '../models/ActionTypes';
+import { ActionTypes } from '../models/ActionTypesResource';
 
 export default defineComponent({
   name: 'EditDialog',
   props: ['dialogOpen'],
-  setup(props) {
+  setup: ({ dialogOpen }) => {
     const store = useStore();
     const sort = computed(() => store.state.sort);
     const oneTask = computed(() => store.state.oneTask);
     // Reactive object prop from TaskList, triggers open/close of dialog
-    const { open } = toRefs(props.dialogOpen);
+    const { open } = toRefs<{ open: boolean }>(dialogOpen);
 
     // Sends edited task info for PUT route to server
     const editTask = (editedTask: TaskSort): void => {

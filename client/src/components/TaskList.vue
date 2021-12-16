@@ -85,20 +85,20 @@
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue';
 import { useStore } from '../store/store';
 // Interfaces
-import { IdSort, IdSortPriority } from '../models/models';
+import { IdSort, IdSortPriority } from '../models/TaskResource';
 // Action types enum
-import { ActionTypes } from '../models/ActionTypes';
+import { ActionTypes } from '../models/ActionTypesResource';
 // Components
 import EditDialog from './EditDialog.vue';
 
 export default defineComponent({
   name: 'TaskList',
-  setup() {
+  setup: () => {
     const store = useStore();
     const tasks = computed(() => store.state.tasks);
     const sort = computed(() => store.state.sort);
-    const dialogOpen = reactive({ open: false });
-    const hover = ref(false);
+    const dialogOpen = reactive<{ open: boolean }>({ open: false });
+    const hover = ref<boolean>(false);
 
     onMounted(() => store.dispatch(ActionTypes.FETCH_TASKS));
 

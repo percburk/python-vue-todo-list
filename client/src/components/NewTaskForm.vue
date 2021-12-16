@@ -34,16 +34,16 @@
 import { reactive, defineComponent, toRefs } from 'vue';
 import { useStore } from '../store/store';
 // Interfaces
-import { NewTask } from '../models/models';
+import { NewTask } from '../models/TaskResource';
 // Action type enum
-import { ActionTypes } from '../models/ActionTypes';
+import { ActionTypes } from '../models/ActionTypesResource';
 
 export default defineComponent({
   name: 'NewTaskForm',
-  setup() {
+  setup: () => {
     const store = useStore();
     // Reactive object which holds new task info
-    const enteredTask: NewTask = reactive({
+    const enteredTask = reactive<NewTask>({
       task: '',
       due_date: undefined,
       priority: '',

@@ -28,11 +28,6 @@ export interface IdSort {
 // Type check to edit priority of a task, requires the string of current
 // priority to toggle on the server along with task id
 export interface IdSortPriority extends IdSort {
-  EditPriority: string;
+  priority: string;
 }
-// Type check for the app's state
-export interface State {
-  tasks: Task[];
-  oneTask: Task;
-  sort: string;
-}
+

@@ -11,12 +11,13 @@ import {
   Task,
   NewTask,
   IdSortPriority,
-  State,
   IdSort,
   TaskSort,
-} from '../models/models';
+} from '../models/TaskResource';
 // Action types enum
-import { ActionTypes } from '../models/ActionTypes';
+import { ActionTypes } from '../models/ActionTypesResource';
+// State model
+import { State } from '../models/StateResource';
 
 // Injection key, so useStore() hook can be used in Vue components
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -47,13 +48,13 @@ export const store = createStore<State>({
 
   // Mutations to set the key/values in state object, type checked
   mutations: {
-    [ActionTypes.SET_TASKS](state: State, tasksFromServer: Task[]): void {
+    [ActionTypes.SET_TASKS]: (state: State, tasksFromServer: Task[]) => {
       state.tasks = tasksFromServer;
     },
-    [ActionTypes.SET_ONE_TASK](state: State, oneTaskFromServer: Task): void {
+    [ActionTypes.SET_ONE_TASK]: (state: State, oneTaskFromServer: Task) => {
       state.oneTask = oneTaskFromServer;
     },
-    [ActionTypes.SET_SORT](state: State, sort: string): void {
+    [ActionTypes.SET_SORT]: (state: State, sort: string) => {
       state.sort = sort;
     },
   },
@@ -62,78 +63,72 @@ export const store = createStore<State>({
   actions: {
     // Fetches all tasks from db. If sort is present in state, sends it along
     // to server to trigger different SQL 'ORDER BY' queries
-    async [ActionTypes.FETCH_TASKS]({ commit }, sort: string): Promise<void> {
-      const whichRoute = sort ? `/api/todos/sort/${sort}` : '/api/todos';
+    [ActionTypes.FETCH_TASKS]: async ({ commit }, sort: string) => {
+      const whichRoute = `/api/todos${sort ? `/sort/${sort}` : ''}`;
       try {
         const response = await axios.get(whichRoute);
-        commit(ActionTypes.SET_TASKS, response.data);
+        commit(ActionTypes.FETCH_ONE_TASK, response.data);
       } catch (err) {
-        console.log('Error in fetchTasks:', err);
+        console.log('Error in FETCH_TASKS:', err);
       }
     },
     // Fetches one task to edit in EditDialog
-    async [ActionTypes.FETCH_ONE_TASK]({ commit }, id: number): Promise<void> {
+    [ActionTypes.FETCH_ONE_TASK]: async ({ commit }, id: number) => {
       try {
         const response = await axios.get(`/api/todos/${id}`);
         commit(ActionTypes.SET_ONE_TASK, response.data);
       } catch (err) {
-        console.log('Error in fetchOneTask:', err);
+        console.log('Error in FETCH_ONE_TASK:', err);
       }
     },
     // Adds a new task to db
-    async [ActionTypes.ADD_TASK]({ dispatch }, task: NewTask): Promise<void> {
+    [ActionTypes.ADD_TASK]: async ({ dispatch }, task: NewTask) => {
       try {
         await axios.post('/api/todos/add', task);
         await dispatch(ActionTypes.FETCH_TASKS);
       } catch (err) {
-        console.log('Error in addTask:', err);
+        console.log('Error in ADD_TASK:', err);
       }
     },
     // Sends edits of a task from EditDialog to db
-    async [ActionTypes.EDIT_TASK]({ dispatch }, task: TaskSort): Promise<void> {
+    [ActionTypes.EDIT_TASK]: async ({ dispatch }, task: TaskSort) => {
       try {
         await axios.put('/api/todos/edit', task);
         await dispatch(ActionTypes.FETCH_TASKS, task.sort);
       } catch (err) {
-        console.log('Error in editTask:', err);
+        console.log('Error in EDIT_TASK:', err);
       }
     },
     // Toggles done status of a task from TaskList
-    async [ActionTypes.TOGGLE_DONE_TASK](
-      { dispatch },
-      sentIdSort: IdSort
-    ): Promise<void> {
+    [ActionTypes.TOGGLE_DONE_TASK]: async ({ dispatch }, sentIdSort: IdSort) => {
       const { id, sort } = sentIdSort;
       try {
         await axios.put(`/api/todos/${id}`);
         await dispatch(ActionTypes.FETCH_TASKS, sort);
       } catch (err) {
-        console.log('Error in toggleDoneTask:', err);
+        console.log('Error in TOGGLE_DONE_TASK:', err);
       }
     },
     // Toggles priority level of task from TaskList
-    async [ActionTypes.TOGGLE_TASK_PRIORITY](
+    [ActionTypes.TOGGLE_TASK_PRIORITY]: async (
       { dispatch },
       priorityToEdit: IdSortPriority
-    ): Promise<void> {
+    ) => {
       try {
         await axios.put('/api/todos/priority', priorityToEdit);
         await dispatch(ActionTypes.FETCH_TASKS, priorityToEdit.sort);
       } catch (err) {
-        console.log('Error in toggleTaskPriority:', err);
+        console.log('Error in TOGGLE_TASK_PRIORITY:', err);
       }
     },
     // Deletes a task from the db
-    async [ActionTypes.DELETE_TASK](
-      { dispatch },
-      sentIdSort: IdSort
-    ): Promise<void> {
+    [ActionTypes.DELETE_TASK]: async ({ dispatch }, sentIdSort: IdSort) => {
       const { id, sort } = sentIdSort;
       try {
         await axios.delete(`/api/todos/${id}`);
         await dispatch(ActionTypes.FETCH_TASKS, sort);
       } catch (err) {
-        console.log('Error in deleteTask:', err);
+        console.log('Error in DELETE_TASK:', err);
       }
     },
   },
